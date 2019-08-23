@@ -11,7 +11,11 @@
   <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.15/lodash.min.js"
     integrity="sha256-VeNaFBVDhoX3H+gJ37DpT/nTuZTdjYro9yBruHjVmoQ=" crossorigin="anonymous"></script>
 
-  <!-- Google Maps API -->
+  <!-- Axios -->
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+  <!-- Google Maps API - Places -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAV2uMO2D8jtvQ26gQf-6D9qTf7thZnGro"></script>
 
   <!-- MapBox -->
   <script src='https://api.mapbox.com/mapbox-gl-js/v1.2.0/mapbox-gl.js'></script>
@@ -167,10 +171,10 @@
       // Do something every quarter of a second, maximum
       SearchOrigin: _.throttle(function () {
         this.debounced_origin = this.search_origin;
-      }, 250),
+      }, 1000),
       SearchDestination: _.throttle(function () {
         this.debounced_destination = this.search_destination;
-      }, 250),
+      }, 1000),
     }
   })
 </script>
