@@ -14,9 +14,6 @@
   <!-- Axios -->
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
-  <!-- Google Maps API - Places -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAV2uMO2D8jtvQ26gQf-6D9qTf7thZnGro"></script>
-
   <!-- MapBox -->
   <script src='https://api.mapbox.com/mapbox-gl-js/v1.2.0/mapbox-gl.js'></script>
   <link href='https://api.mapbox.com/mapbox-gl-js/v1.2.0/mapbox-gl.css' rel='stylesheet' />
@@ -32,6 +29,9 @@
   <!-- FontAwesome -->
   <link href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" rel="stylesheet">
 
+  <!-- UTF-8 Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/utf8/3.0.0/utf8.min.js"></script>
+
   <!-- VueJS -->
   <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 
@@ -41,142 +41,161 @@
   <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
 
+  <!-- Vue Multiselect -->
+  <script src="https://unpkg.com/vue-multiselect@2.1.0"></script>
+  <link rel="stylesheet" href="https://unpkg.com/vue-multiselect@2.1.0/dist/vue-multiselect.min.css">
+
   <!-- SCAT Locations Data -->
   <script src="./scat_locations.js"></script>
 </head>
 
 <style>
-  #mapid {
-    height: 600px;
+  html,
+  body {
+    overflow-y: hidden;
+    position: relative;
   }
 
-  .line-thru {
-    text-decoration: line-through;
+  /* General Tools */
+  .top-space {
+    margin-top: .5rem;
+  }
+
+  /* Major Components */
+  .map {
+    height: 100%;
+    width: 100%;
+    z-index: 10;
+  }
+
+  .search-box {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 100;
+
+    margin-top: 1rem;
+    margin-left: 1rem;
+  }
+
+  /* Selects */
+  .select {
+    width: 25rem;
+    background-color: rgba(255, 255, 255, 0.6) !important;
+
+    transition: background-color .1s;
+  }
+
+  .select:hover {
+    background-color: rgba(255, 255, 255, 1) !important;
+
+    transition: background-color .1s;
+  }
+
+  /* Transitions */
+  .fade-enter-active,
+  .fade-leave-active {
+    transition: opacity .5s;
+  }
+
+  .fade-enter,
+  .fade-leave-to
+
+  /* .fade-leave-active below version 2.1.8 */
+    {
+    opacity: 0;
   }
 </style>
 
 <body>
   <div id="app">
     <v-app>
-      <v-content>
-        <v-container>
-          <v-card max-width="600" class="mx-auto">
-            <v-card-title>{{ message }}</v-card-title>
-            <v-card-text>
+      <div class="map" id="mapid"></div>
 
-              <v-divider></v-divider>
-              <div class="title">Geocoding</div>
-              <v-list>
-                <v-list-item-group>
-                  <v-list-item dense class="line-thru">Debouncing with Lodash</v-list-item>
-                  <v-list-item dense>Geocoding hookup w/ Google API</v-list-item>
-                  <v-list-item dense>Searchable geocoding to closest SCAT points</v-list-item>
-                </v-list-item-group>
-              </v-list>
+      <div class="search-box">
+        <multiselect class="select" v-model="search_origin" label="text" placeholder="From here" :options="to_options"
+          @search-change="GeocodeFrom"></multiselect>
 
-              <div class="title line-thru">Mapping</div>
-              <v-list>
-                <v-list-item-group>
-                  <v-list-item dense class="line-thru">Getting Leaflet w/ OpenStreetMap/MapBox setup</v-list-item>
-                  <v-list-item dense class="line-thru">Getting Leaflet displaying all of the SCAT points</v-list-item>
-                </v-list-item-group>
-              </v-list>
-
-              <div class="title">Machine Learning / Tensorflow</div>
-              <v-list>
-                <v-list-item-group>
-                  <v-list-item dense>Learning ML / different training models</v-list-item>
-                </v-list-item-group>
-              </v-list>
-
-              <div class="title">Misc</div>
-              <v-list>
-                <v-list-item-group>
-                  <v-list-item dense>Dykstras algorithm for finding 5 routes</v-list-item>
-                  <v-list-item dense>Highlighting points / routes on the map</v-list-item>
-                </v-list-item-group>
-              </v-list>
-
-            </v-card-text>
-          </v-card>
-        </v-container>
-
-        <v-container>
-          <v-card max-width="600" class="mx-auto">
-            <v-card-title>Debouncing & Geocoding</v-card-title>
-            <v-card-text>
-
-              <div class="title">Origin</div>
-              <div class="caption" v-if="debounced_origin">Debounced: {{ debounced_origin }}</div>
-              <v-text-field v-model="search_origin" label="Origin"></v-text-field>
-
-              <!-- <v-divider></v-divider> -->
-
-              <div class="title">Destination</div>
-              <div class="caption" v-if="debounced_destination">Debounced: {{ debounced_destination }}</div>
-              <v-text-field v-model="search_destination" label="Destination"></v-text-field>
-            </v-card-text>
-          </v-card>
-        </v-container>
-
-        <v-container>
-          <v-card max-width="600" class="mx-auto">
-            <div id="mapid"></div>
-          </v-card>
-        </v-container>
-
-      </v-content>
+        <transition name="fade">
+          <multiselect v-if="search_origin" class="select top-space" v-model="search_destination" label="text"
+            placeholder="To here" :options="from_options" @search-change="GeocodeTo"></multiselect>
+        </transition>
+      </div>
     </v-app>
   </div>
-</body>
+  <script>
+    Vue.component('multiselect', window.VueMultiselect.default);
 
-<script>
-  var app = new Vue({
-    el: '#app',
-    vuetify: new Vuetify(),
-    icons: {
-      iconfont: 'fa',
-    },
-    mounted: function () {
-      // Initialise Map
-      var mymap = L.map('mapid').setView([-37.8136, 144.9631], 10);
-      L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
-        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-        maxZoom: 18,
-        id: 'mapbox.streets',
-        accessToken: 'pk.eyJ1IjoiZGFuaWVsZmVyZ3Vzb24iLCJhIjoiY2pzeWhhYmVyMHBneTQ0cXgydXJoeDUxMCJ9.LD82Xcdk-WD3a5TMcvdwEg'
-      }).addTo(mymap);
-
-      // Create Points at SCAT Locations
-      scat_locations.forEach(location => {
-        L.marker(location).addTo(mymap);
-      });
-    },
-    data: {
-      message: 'Hello Vue!',
-      search_origin: '',
-      search_destination: '',
-      debounced_origin: '',
-      debounced_destination: ''
-    },
-    watch: {
-      search_origin: function () {
-        this.SearchOrigin()
+    var app = new Vue({
+      el: '#app',
+      vuetify: new Vuetify(),
+      icons: {
+        iconfont: 'fa',
       },
-      search_destination: function () {
-        this.SearchDestination()
+      mounted: function () {
+        this.InitialiseMap();
+      },
+      data: {
+        to_options: [],
+        from_options: [],
+
+        map: null,
+
+        search_origin: '',
+        search_destination: '',
+      },
+      watch: {
+        search_origin: function () {
+          // Add point to map
+          L.marker([this.search_origin.geometry.coordinates[1], this.search_origin.geometry.coordinates[0]]).addTo(this.map);
+        },
+        search_destination: function () {
+          L.marker([this.search_destination.geometry.coordinates[1], this.search_destination.geometry.coordinates[0]]).addTo(this.map);
+        }
+      },
+      methods: {
+        InitialiseMap: function () {
+          this.map = L.map('mapid', { zoomControl: false }).setView([-37.8136, 144.9631], 10);
+
+          // Initialise Map
+          L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+            maxZoom: 18,
+            id: 'mapbox.streets',
+            accessToken: 'pk.eyJ1IjoiZGFuaWVsZmVyZ3Vzb24iLCJhIjoiY2pzeWhhYmVyMHBneTQ0cXgydXJoeDUxMCJ9.LD82Xcdk-WD3a5TMcvdwEg'
+          }).addTo(this.map);
+
+          // Create Points at SCAT Locations
+          scat_locations.forEach(location => {
+            L.marker(location).addTo(this.map);
+          });
+        },
+        GenerateURL: function (query) {
+          return "https://api.mapbox.com/geocoding/v5/mapbox.places/" + encodeURI(query) + ".json?access_token=pk.eyJ1IjoiZGFuaWVsZmVyZ3Vzb24iLCJhIjoiY2pzeWhhYmVyMHBneTQ0cXgydXJoeDUxMCJ9.LD82Xcdk-WD3a5TMcvdwEg";
+        },
+        GeocodeFrom: function (searchQuery, id) {
+          if (searchQuery) {
+            axios
+              .get(this.GenerateURL(searchQuery))
+              .then((response) => {
+                this.to_options = response.data.features
+              })
+              .catch((error) => (console.log(error)))
+          }
+        },
+        GeocodeTo: function (searchQuery, id) {
+          if (searchQuery) {
+            axios
+              .get(this.GenerateURL(searchQuery))
+              .then((response) => {
+                this.from_options = response.data.features
+              })
+              .catch((error) => (console.log(error)))
+          }
+        }
       }
-    },
-    methods: {
-      // Do something every quarter of a second, maximum
-      SearchOrigin: _.throttle(function () {
-        this.debounced_origin = this.search_origin;
-      }, 1000),
-      SearchDestination: _.throttle(function () {
-        this.debounced_destination = this.search_destination;
-      }, 1000),
-    }
-  })
-</script>
+    })
+  </script>
+</body>
 
 </html>
