@@ -79,28 +79,27 @@ def train_seas(models, X_train, y_train, name, config):
 
 def main(argv):
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--model",
-        default="lstm",
-        help="Model to train.")
+    parser.add_argument("--model", default="lstm", help="Model to train.")
+    parser.add_argument("--lag", default="12", help="lags")
+    parser.add_argument("--file_name", default="970_1_data.csv", help="Csv file name")
     args = parser.parse_args()
 
-    lag = 12
+    lag = int(args.lag)
     config = {"batch": 256, "epochs": 600}
-    file = '970_1_data.csv'
+    file = args.file_name
     X_train, y_train, _, _, _ = process_data(file, lag)
 
     if args.model == 'lstm':
         X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
-        m = model.get_lstm([12, 64, 64, 1])
+        m = model.get_lstm([lag, 64, 64, 1])
         train_model(m, X_train, y_train, args.model, config)
     if args.model == 'gru':
         X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
-        m = model.get_gru([12, 64, 64, 1])
+        m = model.get_gru([lag, 64, 64, 1])
         train_model(m, X_train, y_train, args.model, config)
     if args.model == 'saes':
         X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1]))
-        m = model.get_saes([12, 400, 400, 400, 1])
+        m = model.get_saes([lag, 400, 400, 400, 1])
         train_seas(m, X_train, y_train, args.model, config)
 
 

@@ -11,6 +11,7 @@ from keras.utils.vis_utils import plot_model
 import sklearn.metrics as metrics
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+import argparse
 warnings.filterwarnings("ignore")
 
 
@@ -71,8 +72,8 @@ def plot_results(y_true, y_preds, names):
         y_pred: List/ndarray, predicted data.
         names: List, Method names.
     """
-    d = '2016-3-4 00:00'
-    x = pd.date_range(d, periods=288, freq='15min')
+    d = '2006-10-25 19:00'
+    x = pd.date_range(d, periods=384, freq='15min')
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
@@ -94,6 +95,12 @@ def plot_results(y_true, y_preds, names):
 
 
 def main():
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--lag", default="12", help="lags")    
+    args = parser.parse_args()
+    lag = int(args.lag)
+
     lstm = load_model('model/lstm.h5')
     gru = load_model('model/gru.h5')
     saes = load_model('model/saes.h5')
@@ -103,7 +110,9 @@ def main():
     lag = 12
     file = '970_1_data.csv'
     _, _, X_test, y_test, scaler = process_data(file, lag)
+    print(y_test.shape)
     y_test = scaler.inverse_transform(y_test.reshape(-1, 1)).reshape(1, -1)[0]
+    print(y_test.shape)
 
     y_preds = []
     for name, model in zip(names, models):
@@ -115,11 +124,11 @@ def main():
         plot_model(model, to_file=file, show_shapes=True)
         predicted = model.predict(X_test)
         predicted = scaler.inverse_transform(predicted.reshape(-1, 1)).reshape(1, -1)[0]
-        y_preds.append(predicted[:288])
+        y_preds.append(predicted[:384])
         print(name)
         eva_regress(y_test, predicted)
 
-    plot_results(y_test[: 288], y_preds, names)
+    plot_results(y_test[: 384], y_preds, names)
 
 
 if __name__ == '__main__':
