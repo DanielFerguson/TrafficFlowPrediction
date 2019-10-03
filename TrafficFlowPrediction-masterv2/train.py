@@ -80,6 +80,7 @@ def train_seas(models, X_train, y_train, name, config):
 def main(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", default="lstm", help="Model to train.")
+    parser.add_argument("--name", default="lstm", help="name of the trained model")
     parser.add_argument("--lag", default="12", help="specify number of lags")
     parser.add_argument("--file_name", default="970_1_data.csv", help="Csv file name")
     args = parser.parse_args()
@@ -92,15 +93,15 @@ def main(argv):
     if args.model == 'lstm':
         # X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], X_train.shape[2],1))
         m = model.get_lstm([[3,lag], 64, 64, 1])
-        train_model(m, X_train, y_train, args.model, config)
+        train_model(m, X_train, y_train, args.name, config)
     if args.model == 'gru':
         # X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], X_train.shape[2],1))
         m = model.get_gru([[3,lag], 64, 64, 1])
-        train_model(m, X_train, y_train, args.model, config)
+        train_model(m, X_train, y_train, args.name, config)
     if args.model == 'saes':
         X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1],X_train.shape[2]))
         m = model.get_saes([[3,lag], 400, 400, 400, 1])
-        train_seas(m, X_train, y_train, args.model, config)
+        train_seas(m, X_train, y_train, args.name, config)
 
 
 if __name__ == '__main__':

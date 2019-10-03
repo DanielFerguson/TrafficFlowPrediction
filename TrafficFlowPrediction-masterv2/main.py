@@ -98,14 +98,15 @@ def main():
 
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--lag", default="12", help="lags")   
+    parser.add_argument("--lag", default="12", help="lags")
+    parser.add_argument("--model", default="model/lstm.h5", help="lags")   
     args = parser.parse_args()
     lag = int(args.lag)
 
 
-    lstm = load_model('model/lstm.h5')
-    gru = load_model('model/gru.h5')
-    saes = load_model('model/saes.h5')
+    lstm = load_model('model/{}_lstm.h5'.format(args.model))
+    gru = load_model('model/{}_gru.h5'.format(args.model))
+    saes = load_model('model/{}_saes.h5'.format(args.model))
     models = [lstm, gru]
     names = ['LSTM', 'GRU']
 
