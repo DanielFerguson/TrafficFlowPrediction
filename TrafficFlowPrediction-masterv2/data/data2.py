@@ -49,7 +49,7 @@ def process_data(file, lags):
     """
     
 #     read csv file
-    df = pd.read_csv("data/{}".format(file), encoding='utf-8',header=None).fillna(0)
+    df = pd.read_csv("../Data/data/{}".format(file), encoding='utf-8',header=None).fillna(0)
     df2 = pd.read_csv("data/rain_weekend.csv", encoding='utf-8').fillna(0)
    
     
