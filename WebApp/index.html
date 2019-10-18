@@ -257,7 +257,7 @@
 
           <div>
             <div class="card option-card mb-3" v-for="i in 5">
-              <div class="card-body option-card-body">
+              <div class="card-body option-card-body" :option="'option' + i" @click="SelectOption(i)">
                 <h3 class="card-title">Route #{{i}}</h3>
                 <h6 class="card-subtitle text-muted">Distance: 24.32kms</h6>
                 <h6 class="card-subtitle text-muted">Estimated Time: 12mins</h6>
@@ -369,6 +369,9 @@
         }
       },
       methods: {
+        SelectOption: function (event) {
+          console.log(event);
+        },
         UpdateSearchMethod: function (event) {
           this.search_type = event.target.value;
         },
