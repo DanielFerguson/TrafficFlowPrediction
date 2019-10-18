@@ -53,134 +53,10 @@
 
   <!-- SCAT Locations Data -->
   <script src="./groups.js"></script>
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
 </head>
-
-<style>
-  html,
-  body {
-    overflow-y: hidden;
-    position: relative;
-  }
-
-  /* General Tools */
-  .top-space {
-    margin-top: .5rem;
-  }
-
-  /* Major Components */
-  .map {
-    height: 100%;
-    width: 100%;
-    z-index: 10;
-  }
-
-  .search-box {
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 100;
-
-    margin-top: 1rem;
-    margin-left: 1rem;
-  }
-
-  .options-box {
-    background-color: white;
-    border-radius: 5px;
-    border: 1px solid #e8e8e8;
-
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    z-index: 100;
-
-    width: 25rem;
-
-    margin: 1rem;
-    margin-right: 1rem;
-  }
-
-  .option-card {
-    width: 100%;
-    border: 1px solid #e8e8e8;
-    border-radius: 5px;
-
-    background-color: white;
-
-    transition: .2s;
-
-    cursor: pointer;
-  }
-
-  .option-card:hover {
-    transform: scale(1.02);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
-  }
-
-  .option-card-body {
-    padding: .5em;
-  }
-
-  .row {
-    margin-right: 0 !important;
-    margin-left: 0 !important;
-  }
-
-  .select {
-    width: 25rem;
-    background-color: rgba(255, 255, 255, 0.6) !important;
-
-    transition: background-color .1s;
-  }
-
-  .select:hover {
-    background-color: rgba(255, 255, 255, 1) !important;
-
-    transition: background-color .1s;
-  }
-
-  .multiselect__tags {
-    padding: 8px 0 0 8px !important;
-  }
-
-  .custom-select {
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-  }
-
-  input {
-    width: 100% !important;
-  }
-
-  .col-6,
-  .col-5,
-  .col-3,
-  .col-2 {
-    padding: 0 !important
-  }
-
-  /* Transitions */
-  .fade-enter-active,
-  .fade-leave-active {
-    transition: opacity .5s;
-  }
-
-  .fade-enter,
-  .fade-leave-to {
-    opacity: 0;
-  }
-
-  .slide-enter-active,
-  .slide-leave-active {
-    transition: all 0.5s ease-in-out;
-  }
-
-  .slide-enter,
-  .slide-leave-to {
-    left: -500px;
-    opacity: 0;
-  }
-</style>
 
 <body>
   <div id="app">
@@ -192,17 +68,14 @@
           <div class="multiselect__tags">
 
             <div class="row">
-              <!-- Hour -->
               <div class="col-2">
                 <input type="number" id="inputHour" value="10" class="form-control">
               </div>
 
-              <!-- Minute -->
               <div class="col-2">
                 <input type="number" id="inputHour" value="30" class="form-control">
               </div>
 
-              <!-- AM / PM -->
               <div class="col-2 text-center">
                 <select class="custom-select mr-sm-2">
                   <option selected value="AM">AM</option>
@@ -257,7 +130,7 @@
 
           <div>
             <div class="card option-card mb-3" v-for="i in 5">
-              <div class="card-body option-card-body" :option="'option' + i" @click="SelectOption(i)">
+              <div class="card-body option-card-body" :option="'option' + i" @click="SelectRoute(i)">
                 <h3 class="card-title">Route #{{i}}</h3>
                 <h6 class="card-subtitle text-muted">Distance: 24.32kms</h6>
                 <h6 class="card-subtitle text-muted">Estimated Time: 12mins</h6>
@@ -280,6 +153,8 @@
     var paths = [];
     var temp_paths = [];
 
+    var options = [];
+
     Vue.component('multiselect', window.VueMultiselect.default);
 
     var app = new Vue({
@@ -301,6 +176,8 @@
 
         entry_point: null,
         exit_point: null,
+
+        routes: [],
 
         final_distance: null,
 
@@ -325,6 +202,7 @@
           this.search_destination = '';
           this.scat_origin = '';
           this.scat_destination = '';
+          this.routes = [];
         },
         search_origin: function () {
           var lat = this.search_origin.geometry.coordinates[1];
@@ -364,135 +242,127 @@
             [result.nearest.lat, result.nearest.lng]
           ], 'red', true);
 
-          // Generate path
-          this.GeneratePath(this.entry_point, this.exit_point);
+          // Generate routes
+          for (let i = 0; i < 5; i++) {
+            this.routes.push(this.GenerateRoute());
+          }
         }
       },
       methods: {
-        SelectOption: function (event) {
-          console.log(event);
+        SelectRoute: function (event) {
+          console.log('Select route #' + event);
         },
         UpdateSearchMethod: function (event) {
           this.search_type = event.target.value;
         },
 
-        GeneratePath: async function (entry_obj, exit_obj) {
-          function sleep(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-          }
 
-          function DrawLineOfSight(los, line) {
-            console.log('Drawing Line');
+        GenerateRoute: function () {
+          var starting_point = this.entry_point;
+          var current_point = starting_point;
 
-            // Remove previous LOS
-            line ? this.map.removeLayer(line) : null;
+          var steps = [starting_point]; // A list of all nodes travelled to/from, initalized with entry point
+          var total_distance = 0; // Total distance travelled
 
-            // Redraw the new LOS
+          // Generate Seeded Starting Point
+          var num_steps = Math.floor(Math.random() * 5) + 1; // Generates a random int between 0 to 5
+          var step_index = 0; // Current index
 
-            return app.DrawLine([
-              [los.geometry.coordinates[0][0], los.geometry.coordinates[0][1]],
-              [los.geometry.coordinates[1][0], los.geometry.coordinates[1][1]]
-            ], 'purple', false);
-          }
+          for (let i = 0; i < num_steps; i++) {
+            // First - Find the next point
+            var next_point_id = null;
 
-          // Record these variables for visualisation later
-          var total_distance = 0;
-          var steps = [];
-          var spin_index = 0;
+            if (starting_point.neighbours.length == 1) {
+              // If only one neighbour, traverse to that neighbour
+              next_point_id = current_point.neighbours[0];
 
-          var line_of_sight_line = null;
+            } else {
+              // If there are more than one neighbour, pick a random direction to go  
+              var num_neighbours = current_point.neighbours.length;
+              var neighbour_selection = Math.floor(Math.random() * (num_neighbours + 1));
 
-          var current_point = entry_obj;
-          steps.push(entry_obj);
-
-          while (current_point != exit_obj && spin_index < 100) {
-            await sleep(2000);
-
-            // Create line from current_point to exit_point
-            var line_of_sight = turf.lineString([
-              [current_point.lat, current_point.lng],
-              [exit_obj.lat, exit_obj.lng]
-            ]);
-
-            DrawLineOfSight(line_of_sight, line_of_sight_line);
-
-            // Check to see if current point only has one neighbour, if so traverse that
-            if (current_point.neighbours.length == 1) {
-              console.log('DEBUG: Only found one neighbour, traversing that');
-
-              // Before we update the current_obj, calculate the distance between the two points
-              var next_obj = _.find(groups, ['scat_id', current_point.neighbours[0]]);
-              var evaluated_dist = this.CalculateDistance(
-                [current_point.lat, current_point.lng],
-                [next_obj.lat, next_obj.lng]
-              );
-
-              // Update the globals
-              total_distance += evaluated_dist;
-              steps.push(next_obj);
-
-              // Draw the navigation line
-              if (current_point != entry_obj) {
-                this.DrawLine([
-                  [next_obj.lat, next_obj.lng],
-                  [current_point.lat, current_point.lng]
-                ], 'purple', true)
-
-              }
-              current_point = next_obj;
-              console.log('DEBUG: Traversed');
+              next_point_id = current_point.neighbours[neighbour_selection];
             }
-            else {
+
+            // Get the object for the scat_id
+            var next_point_obj = _.find(groups, ['scat_id', next_point_id]);
+
+            // Find the distance between current_point --> next_point, record it in total_distance
+            total_distance += this.CalculateDistance([next_point_obj.lat, next_point_obj.lng], [current_point.lat, current_point.lng]);
+
+            // Push the record of the traversal onto steps
+            steps.push(next_point_id);
+
+            // Set the current_point to the found object of the next_point in groups
+            current_point = next_point_obj;
+          }
+
+          // Second - Find the quickest path from seeded location
+          var next_point_id = null;
+
+          while (current_point != this.exit_point) {
+            if (current_point.neighbours.includes(this.exit_point.scat_id)) {
+              // Check if one of the neighbours is the end point
+
+              // Get the object for the scat_id
+              var next_point_obj = this.exit_point;
+
+              // Find the distance between current_point --> next_point, record it in total_distance
+              total_distance += this.CalculateDistance([next_point_obj.lat, next_point_obj.lng], [current_point.lat, current_point.lng]);
+
+              // Push the record of the traversal onto steps
+              steps.push(next_point_id);
+
+              // Set the current_point to the found object of the next_point in groups
+              current_point = next_point_obj;
+
+            } else if (current_point.neighbours.length == 1) {
+
+              // If only one neighbour, traverse to that neighbour
+              next_point_id = current_point.neighbours[0];
+
+            } else {
               // There are more than 1 neighbours, evaluate which is closest to line
-              var evaluated_dist = 1000000000;
-              var closest_neighbour = null;
 
-              current_point.neighbours.forEach(neighbour_id => {
-                // Get the object
-                var neighbour_obj = _.find(groups, ['scat_id', neighbour_id]);
+              // Generate a Line of Sight from the point; this will help us make informed decisions about 
+              // the best neighbour to traverse to
+              var los_line = turf.lineString([
+                [current_point.lat, current_point.lng],
+                [this.exit_point.lat, this.exit_point.lng]
+              ]);
 
-                // Check that step hasn't previously been taken
-                var new_step = true;
-                steps.forEach(prev_step => {
-                  neighbour_obj.scat_id == prev_step.scat_id
-                    ? new_step = false
-                    : null;
-                });
+              // TODO: Check that this isnt the previous step (stopping a potential infinite loop).
+              var closest_distance = 100;
 
-                if (new_step) {
-                  // Check that neighbour hasnt been traversed before
-                  var pt = turf.point([parseFloat(neighbour_obj.lat), parseFloat(neighbour_obj.lng)]);
+              current_point.neighbours.forEach(n_id => {
+                var n_obj = _.find(groups, ['scat_id', n_id]);
 
-                  var line_of_sight = turf.lineString([
-                    [neighbour_obj.lat, neighbour_obj.lng],
-                    [exit_obj.lat, exit_obj.lng]
-                  ]);
+                var dist_to_end = this.CalculateDistance(
+                  [parseFloat(n_obj.lat), parseFloat(n_obj.lng)], 
+                  [this.exit_point.lat, this.exit_point.lng]
+                );
 
-                  var obj_dist = turf.pointToLineDistance(pt, line_of_sight, { units: 'kilometers' });
-
-                  // If this neighbour than previous (or is first), record that and the distance
-                  if (obj_dist < evaluated_dist) {
-                    evaluated_dist = obj_dist;
-                    closest_neighbour = neighbour_obj;
-                  }
+                if (dist_to_end < closest_distance) {
+                  next_point_id = n_id;
                 }
               });
 
-              // Once shortest path has been found, record these details
-              total_distance += this.CalculateDistance(
-                [current_point.lat, current_point.lng],
-                [closest_neighbour.lat, closest_neighbour.lng]
-              );
-              current_point = closest_neighbour;
-              steps.push(closest_neighbour);
+              // Get the object for the scat_id
+              var next_point_obj = _.find(groups, ['scat_id', next_point_id]);
+
+              // Find the distance between current_point --> next_point, record it in total_distance
+              total_distance += this.CalculateDistance([next_point_obj.lat, next_point_obj.lng], [current_point.lat, current_point.lng]);
+
+              // Push the record of the traversal onto steps
+              steps.push(next_point_id);
+
+              // Set the current_point to the found object of the next_point in groups
+              current_point = next_point_obj;
             }
 
-            // Just to make sure we don't break thing
-            spin_index++;
           }
 
-          // 
-          this.final_distance = total_distance;
+          return {'steps': steps, 'distance': total_distance};
         },
 
         // Accumulative Function
@@ -515,10 +385,10 @@
             var lng = location['lng'];
             var id = location['scat_id'];
 
-            L.marker([lat, lng]).bindPopup("<b>Scat ID: " + id + "</b>").on('click', this.DrawConnections).addTo(this.map);
+            L.marker([lat, lng]).bindPopup("<b>Scat ID: " + id + "</b>").on('click', this.DrawNeighbourConnections).addTo(this.map);
           });
         },
-        DrawConnections: function (marker) {
+        DrawNeighbourConnections: function (marker) {
           // Remove all current connections
           this.RemoveLines();
           temp_paths = [];
@@ -570,7 +440,6 @@
           };
         },
         CalculateDistance: function (pointOne, pointTwo) {
-
           var from = turf.point([pointOne[0], pointOne[1]]);
           var to = turf.point([pointTwo[0], pointTwo[1]]);
           var options = {

@@ -1,0 +1,124 @@
+html,
+  body {
+    overflow-y: hidden;
+    position: relative;
+  }
+
+  /* General Tools */
+  .top-space {
+    margin-top: .5rem;
+  }
+
+  /* Major Components */
+  .map {
+    height: 100%;
+    width: 100%;
+    z-index: 10;
+  }
+
+  .search-box {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 100;
+
+    margin-top: 1rem;
+    margin-left: 1rem;
+  }
+
+  .options-box {
+    background-color: white;
+    border-radius: 5px;
+    border: 1px solid #e8e8e8;
+
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    z-index: 100;
+
+    width: 25rem;
+
+    margin: 1rem;
+    margin-right: 1rem;
+  }
+
+  .option-card {
+    width: 100%;
+    border: 1px solid #e8e8e8;
+    border-radius: 5px;
+
+    background-color: white;
+
+    transition: .2s;
+
+    cursor: pointer;
+  }
+
+  .option-card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+  }
+
+  .option-card-body {
+    padding: .5em;
+  }
+
+  .row {
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+  }
+
+  .select {
+    width: 25rem;
+    background-color: rgba(255, 255, 255, 0.6) !important;
+
+    transition: background-color .1s;
+  }
+
+  .select:hover {
+    background-color: rgba(255, 255, 255, 1) !important;
+
+    transition: background-color .1s;
+  }
+
+  .multiselect__tags {
+    padding: 8px 0 0 8px !important;
+  }
+
+  .custom-select {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+
+  input {
+    width: 100% !important;
+  }
+
+  .col-6,
+  .col-5,
+  .col-3,
+  .col-2 {
+    padding: 0 !important
+  }
+
+  /* Transitions */
+  .fade-enter-active,
+  .fade-leave-active {
+    transition: opacity .5s;
+  }
+
+  .fade-enter,
+  .fade-leave-to {
+    opacity: 0;
+  }
+
+  .slide-enter-active,
+  .slide-leave-active {
+    transition: all 0.5s ease-in-out;
+  }
+
+  .slide-enter,
+  .slide-leave-to {
+    left: -500px;
+    opacity: 0;
+  }
