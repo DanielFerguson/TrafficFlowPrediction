@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Traffic Flow</title>
+
+  <!-- Lodash -->
+  <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.15/lodash.min.js"
+    integrity="sha256-VeNaFBVDhoX3H+gJ37DpT/nTuZTdjYro9yBruHjVmoQ=" crossorigin="anonymous"></script>
+
+  <!-- Axios -->
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+  <!-- MapBox -->
+  <script src='https://api.mapbox.com/mapbox-gl-js/v1.2.0/mapbox-gl.js'></script>
+  <link href='https://api.mapbox.com/mapbox-gl-js/v1.2.0/mapbox-gl.css' rel='stylesheet' />
+
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"
+    integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+    crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"
+    integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
+    crossorigin=""></script>
+
+  <!-- FontAwesome -->
+  <link href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" rel="stylesheet">
+
+  <!-- UTF-8 Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/utf8/3.0.0/utf8.min.js"></script>
+
+  <!-- VueJS -->
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+  <!-- Vuetify -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/@mdi/font@3.x/css/materialdesignicons.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+
+  <!-- Vue Multiselect -->
+  <script src="https://unpkg.com/vue-multiselect@2.1.0"></script>
+  <link rel="stylesheet" href="https://unpkg.com/vue-multiselect@2.1.0/dist/vue-multiselect.min.css">
+
+  <!-- Turfjs -->
+  <script src='https://npmcdn.com/@turf/turf/turf.min.js'></script>
+
+  <!-- Tensorflow -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.0/dist/tf.min.js"></script>
+
+  <!-- SCAT Locations Data -->
+  <script src="./groups.js"></script>
+</head>
+
+<style>
+  html,
+  body {
+    overflow-y: hidden;
+    position: relative;
+  }
+
+  /* General Tools */
+  .top-space {
+    margin-top: .5rem;
+  }
+
+  /* Major Components */
+  .map {
+    height: 100%;
+    width: 100%;
+    z-index: 10;
+  }
+
+  .search-box {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 100;
+
+    margin-top: 1rem;
+    margin-left: 1rem;
+  }
+
+  .options-box {
+    background-color: white;
+    border-radius: 5px;
+    border: 1px solid #e8e8e8;
+
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    z-index: 100;
+
+    width: 25rem;
+
+    margin: 1rem;
+    margin-right: 1rem;
+  }
+
+  .option-card {
+    width: 100%;
+    border: 1px solid #e8e8e8;
+    border-radius: 5px;
+
+    background-color: white;
+
+    transition: .2s;
+
+    cursor: pointer;
+  }
+
+  .option-card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+  }
+
+  .option-card-body {
+    padding: .5em;
+  }
+
+  .row {
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+  }
+
+  .select {
+    width: 25rem;
+    background-color: rgba(255, 255, 255, 0.6) !important;
+
+    transition: background-color .1s;
+  }
+
+  .select:hover {
+    background-color: rgba(255, 255, 255, 1) !important;
+
+    transition: background-color .1s;
+  }
+
+  .multiselect__tags {
+    padding: 8px 0 0 8px !important;
+  }
+
+  .custom-select {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+
+  input {
+    width: 100% !important;
+  }
+
+  .col-6,
+  .col-5,
+  .col-3,
+  .col-2 {
+    padding: 0 !important
+  }
+
+  /* Transitions */
+  .fade-enter-active,
+  .fade-leave-active {
+    transition: opacity .5s;
+  }
+
+  .fade-enter,
+  .fade-leave-to {
+    opacity: 0;
+  }
+
+  .slide-enter-active,
+  .slide-leave-active {
+    transition: all 0.5s ease-in-out;
+  }
+
+  .slide-enter,
+  .slide-leave-to {
+    left: -500px;
+    opacity: 0;
+  }
+</style>
+
+<body>
+  <div id="app">
+    <v-app>
+      <div class="map" id="mapid"></div>
+
+      <div class="search-box">
+        <div class="multiselect select mb-2">
+          <div class="multiselect__tags">
+
+            <div class="row">
+              <!-- Hour -->
+              <div class="col-2">
+                <input type="number" id="inputHour" value="10" class="form-control">
+              </div>
+
+              <!-- Minute -->
+              <div class="col-2">
+                <input type="number" id="inputHour" value="30" class="form-control">
+              </div>
+
+              <!-- AM / PM -->
+              <div class="col-2 text-center">
+                <select class="custom-select mr-sm-2">
+                  <option selected value="AM">AM</option>
+                  <option value="PM">PM</option>
+                </select>
+              </div>
+
+              <div class="col-3 text-center">
+                <select class="custom-select mr-sm-2">
+                  <option selected value="weekday">Weekday</option>
+                  <option value="weekend">Weekend</option>
+                </select>
+              </div>
+
+              <div class="col-3 text-center">
+                <select class="custom-select mr-sm-2" @change="UpdateSearchMethod($event)">
+                  <option selected value="location">Location</option>
+                  <option value="scat">SCAT Site</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <multiselect v-if="search_type == 'location'" class="select" v-model="search_origin" label="text"
+          placeholder="Origin" :options="to_options" @search-change="GeocodeFrom"></multiselect>
+
+        <multiselect v-else class="select" v-model="scat_origin" placeholder="Origin" :options="scat_sites"
+          @search-change="console.log('hello')"></multiselect>
+
+        <transition name="fade">
+          <multiselect v-if="search_origin" class="select top-space" v-model="search_destination" label="text"
+            placeholder="Destination" :options="from_options" @search-change="GeocodeTo"></multiselect>
+
+          <multiselect v-if="scat_origin" class="select top-space" v-model="scat_destination" placeholder="Destination"
+            :options="scat_sites" @search-change="console.log('there')"></multiselect>
+        </transition>
+      </div>
+
+      <transition name="slide">
+        <div class="container options-box" style="right: 0;" v-if="search_destination || scat_destination">
+          <div class="row">
+            <h2 class="mb-2">Options</h2>
+            <span class="ml-auto">
+              Sort By:
+              <select class="custom-select my-1 mr-sm-2">
+                <option selected value="dist">Distance</option>
+                <option value="time">Estimated Time</option>
+              </select>
+            </span>
+          </div>
+
+          <div>
+            <div class="card option-card mb-3" v-for="i in 5">
+              <div class="card-body option-card-body">
+                <h3 class="card-title">Route #{{i}}</h3>
+                <h6 class="card-subtitle text-muted">Distance: 24.32kms</h6>
+                <h6 class="card-subtitle text-muted">Estimated Time: 12mins</h6>
+              </div>
+            </div>
+          </div>
+        </div>
+      </transition>
+    </v-app>
+  </div>
+  <script>
+    var userSetIcon = L.icon({
+      iconUrl: './assets/red_marker.png',
+      iconSize: [36, 41],
+      iconAnchor: [18, 41],
+
+      popupAnchor: [-3, -76]
+    });
+
+    var paths = [];
+    var temp_paths = [];
+
+    Vue.component('multiselect', window.VueMultiselect.default);
+
+    var app = new Vue({
+      el: '#app',
+      vuetify: new Vuetify(),
+      icons: {
+        iconfont: 'fa',
+      },
+      mounted: function () {
+        this.InitialiseMap();
+      },
+      data: {
+        to_options: [],
+        from_options: [],
+
+        map: null,
+
+        search_type: 'location',
+
+        entry_point: null,
+        exit_point: null,
+
+        final_distance: null,
+
+        search_origin: '',
+        search_destination: '',
+        scat_origin: '',
+        scat_destination: ''
+      },
+      computed: {
+        scat_sites: function () {
+          var list = [];
+          groups.forEach(site => {
+            list.push(site.scat_id)
+          });
+          return list;
+        }
+      },
+      watch: {
+        search_type: function () {
+          // When this is changed, reset all input vars
+          this.search_origin = '';
+          this.search_destination = '';
+          this.scat_origin = '';
+          this.scat_destination = '';
+        },
+        search_origin: function () {
+          var lat = this.search_origin.geometry.coordinates[1];
+          var lng = this.search_origin.geometry.coordinates[0];
+
+          // Add Point Marker to map
+          L.marker([lat, lng], {
+            icon: userSetIcon
+          }).addTo(this.map);
+
+          // Link to the closest Marker
+          var result = this.FindNearestPoint(lat, lng);
+          this.entry_point = result.nearest;
+
+          // Draw line between points
+          this.DrawLine([
+            [lat, lng],
+            [result.nearest.lat, result.nearest.lng]
+          ], 'red', true);
+        },
+        search_destination: function () {
+          var lat = this.search_destination.geometry.coordinates[1];
+          var lng = this.search_destination.geometry.coordinates[0];
+
+          // Add Point Marker to map
+          L.marker([lat, lng], {
+            icon: userSetIcon
+          }).addTo(this.map);
+
+          // Link to the closest Marker
+          var result = this.FindNearestPoint(lat, lng);
+          this.exit_point = result.nearest;
+
+          // Draw line between points
+          this.DrawLine([
+            [lat, lng],
+            [result.nearest.lat, result.nearest.lng]
+          ], 'red', true);
+
+          // Generate path
+          this.GeneratePath(this.entry_point, this.exit_point);
+        }
+      },
+      methods: {
+        UpdateSearchMethod: function (event) {
+          this.search_type = event.target.value;
+        },
+
+        GeneratePath: async function (entry_obj, exit_obj) {
+          function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+          }
+
+          function DrawLineOfSight(los, line) {
+            console.log('Drawing Line');
+
+            // Remove previous LOS
+            line ? this.map.removeLayer(line) : null;
+
+            // Redraw the new LOS
+
+            return app.DrawLine([
+              [los.geometry.coordinates[0][0], los.geometry.coordinates[0][1]],
+              [los.geometry.coordinates[1][0], los.geometry.coordinates[1][1]]
+            ], 'purple', false);
+          }
+
+          // Record these variables for visualisation later
+          var total_distance = 0;
+          var steps = [];
+          var spin_index = 0;
+
+          var line_of_sight_line = null;
+
+          var current_point = entry_obj;
+          steps.push(entry_obj);
+
+          while (current_point != exit_obj && spin_index < 100) {
+            await sleep(2000);
+
+            // Create line from current_point to exit_point
+            var line_of_sight = turf.lineString([
+              [current_point.lat, current_point.lng],
+              [exit_obj.lat, exit_obj.lng]
+            ]);
+
+            DrawLineOfSight(line_of_sight, line_of_sight_line);
+
+            // Check to see if current point only has one neighbour, if so traverse that
+            if (current_point.neighbours.length == 1) {
+              console.log('DEBUG: Only found one neighbour, traversing that');
+
+              // Before we update the current_obj, calculate the distance between the two points
+              var next_obj = _.find(groups, ['scat_id', current_point.neighbours[0]]);
+              var evaluated_dist = this.CalculateDistance(
+                [current_point.lat, current_point.lng],
+                [next_obj.lat, next_obj.lng]
+              );
+
+              // Update the globals
+              total_distance += evaluated_dist;
+              steps.push(next_obj);
+
+              // Draw the navigation line
+              if (current_point != entry_obj) {
+                this.DrawLine([
+                  [next_obj.lat, next_obj.lng],
+                  [current_point.lat, current_point.lng]
+                ], 'purple', true)
+
+              }
+              current_point = next_obj;
+              console.log('DEBUG: Traversed');
+            }
+            else {
+              // There are more than 1 neighbours, evaluate which is closest to line
+              var evaluated_dist = 1000000000;
+              var closest_neighbour = null;
+
+              current_point.neighbours.forEach(neighbour_id => {
+                // Get the object
+                var neighbour_obj = _.find(groups, ['scat_id', neighbour_id]);
+
+                // Check that step hasn't previously been taken
+                var new_step = true;
+                steps.forEach(prev_step => {
+                  neighbour_obj.scat_id == prev_step.scat_id
+                    ? new_step = false
+                    : null;
+                });
+
+                if (new_step) {
+                  // Check that neighbour hasnt been traversed before
+                  var pt = turf.point([parseFloat(neighbour_obj.lat), parseFloat(neighbour_obj.lng)]);
+
+                  var line_of_sight = turf.lineString([
+                    [neighbour_obj.lat, neighbour_obj.lng],
+                    [exit_obj.lat, exit_obj.lng]
+                  ]);
+
+                  var obj_dist = turf.pointToLineDistance(pt, line_of_sight, { units: 'kilometers' });
+
+                  // If this neighbour than previous (or is first), record that and the distance
+                  if (obj_dist < evaluated_dist) {
+                    evaluated_dist = obj_dist;
+                    closest_neighbour = neighbour_obj;
+                  }
+                }
+              });
+
+              // Once shortest path has been found, record these details
+              total_distance += this.CalculateDistance(
+                [current_point.lat, current_point.lng],
+                [closest_neighbour.lat, closest_neighbour.lng]
+              );
+              current_point = closest_neighbour;
+              steps.push(closest_neighbour);
+            }
+
+            // Just to make sure we don't break thing
+            spin_index++;
+          }
+
+          // 
+          this.final_distance = total_distance;
+        },
+
+        // Accumulative Function
+        InitialiseMap: function () {
+          this.map = L.map('mapid', {
+            zoomControl: false
+          }).setView([-37.8131, 145.0678], 13);
+
+          // Initialise Map
+          L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+            maxZoom: 18,
+            id: 'mapbox.streets',
+            accessToken: 'pk.eyJ1IjoiZGFuaWVsZmVyZ3Vzb24iLCJhIjoiY2pzeWhhYmVyMHBneTQ0cXgydXJoeDUxMCJ9.LD82Xcdk-WD3a5TMcvdwEg'
+          }).addTo(this.map);
+
+          // Create Markers
+          groups.forEach(location => {
+            var lat = location['lat'];
+            var lng = location['lng'];
+            var id = location['scat_id'];
+
+            L.marker([lat, lng]).bindPopup("<b>Scat ID: " + id + "</b>").on('click', this.DrawConnections).addTo(this.map);
+          });
+        },
+        DrawConnections: function (marker) {
+          // Remove all current connections
+          this.RemoveLines();
+          temp_paths = [];
+
+          // Get the object of the selected marker
+          var obj = _.find(groups, {
+            'lat': marker.latlng.lat.toString(),
+            'lng': marker.latlng.lng.toString()
+          });
+
+          // Get the objects for the selected markers neighbours
+          var neighbour_objs = [];
+
+          obj.neighbours.forEach(neighbour => {
+
+            // Draw a line from the selected marker to the neighbour marker
+            var n_obj = _.find(groups, ['scat_id', neighbour]);
+
+            this.DrawLine([
+              [obj.lat, obj.lng],
+              [n_obj.lat, n_obj.lng]
+            ], 'blue', false);
+          });
+        },
+
+        // Mapping & Drawing Functions
+        FindNearestPoint: function (lat, lng) {
+          var points = [];
+
+          // Create array of Turn Points
+          groups.forEach(point => {
+            points.push(
+              turf.point([parseFloat(point.lat), parseFloat(point.lng)])
+            );
+          });
+
+          var origin_point = turf.point([lat, lng]);
+
+          // Find nearest Point
+          var nearest_pos = turf.nearestPoint(origin_point, turf.featureCollection(points));
+
+          // Get the Object for the nearest Point & distance to
+          var nearest_obj = groups[nearest_pos.properties.featureIndex];
+          var distance_to = nearest_pos.properties.distanceToPoint;
+
+          return {
+            'nearest': nearest_obj,
+            'distance': distance_to
+          };
+        },
+        CalculateDistance: function (pointOne, pointTwo) {
+
+          var from = turf.point([pointOne[0], pointOne[1]]);
+          var to = turf.point([pointTwo[0], pointTwo[1]]);
+          var options = {
+            units: 'kilometers'
+          };
+
+          return turf.distance(from, to, options);
+        },
+        DrawLine: function (latlngs, colour, notTemp) {
+          var pointOne = [parseFloat(latlngs[0][0]), parseFloat(latlngs[0][1])];
+          var pointTwo = [parseFloat(latlngs[1][0]), parseFloat(latlngs[1][1])];
+
+          var l = L.polyline([latlngs], {
+            color: colour
+          }).bindPopup("Distance: <b>" + this.CalculateDistance(pointOne, pointTwo).toFixed(2) + "kms</b>").addTo(this.map);
+
+          // If temp (starting/ending lines) verticies, add to the temp directory 
+          notTemp
+            ? paths.push(l)
+            : temp_paths.push(l);
+        },
+        RemoveLines: function () {
+          temp_paths.forEach(path => {
+            this.map.removeLayer(path);
+          });
+        },
+
+        // Geocoding Functions
+        GenerateURL: function (query) {
+          return "https://api.mapbox.com/geocoding/v5/mapbox.places/" + encodeURI(query) + ".json?access_token=pk.eyJ1IjoiZGFuaWVsZmVyZ3Vzb24iLCJhIjoiY2pzeWhhYmVyMHBneTQ0cXgydXJoeDUxMCJ9.LD82Xcdk-WD3a5TMcvdwEg&country=au";
+        },
+        GeocodeFrom: function (searchQuery, id) {
+          if (searchQuery) {
+            axios
+              .get(this.GenerateURL(searchQuery))
+              .then((response) => {
+                this.to_options = response.data.features
+              })
+              .catch((error) => (console.log(error)))
+          }
+        },
+        GeocodeTo: function (searchQuery, id) {
+          if (searchQuery) {
+            axios
+              .get(this.GenerateURL(searchQuery))
+              .then((response) => {
+                this.from_options = response.data.features
+              })
+              .catch((error) => (console.log(error)))
+          }
+        }
+      }
+    })
+  </script>
+</body>
+
+</html>
