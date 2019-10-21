@@ -130,7 +130,7 @@
 
           <div>
             <div class="card option-card mb-3" v-for="(route, index) in routes" :key="index">
-              <div class="card-body option-card-body" @click="SelectRoute(route)" @mouseover="Debug({event: 'hover'})" @mouseleave="Debug({event: 'leave'})">
+              <div class="card-body option-card-body" @click="SelectRoute(index)" @mouseover="HighlightRoute('hover', index)" @mouseleave="HighlightRoute('leave')">
                 <h3 class="card-title">Route #{{ index + 1 }}</h3>
                 <h6 class="card-subtitle text-muted">Distance: {{ route.distance.toFixed(2) }}kms</h6>
                 <h6 class="card-subtitle text-muted">Complexity: {{ route.steps.length }} steps</h6>
@@ -172,6 +172,8 @@
         from_options: [],
 
         map: null,
+
+        route_drawn: false,
 
         search_type: 'location',
 
@@ -248,15 +250,27 @@
             var generated_seed = this.GenerateSeededStart();
             this.routes.push(this.FindPathBetweenPoints(generated_seed, this.exit_point));
           }
-
-          // DEBUG
-          // Draw the first route as a test for hovering over the routes
-          this.DrawRoute(this.routes[0]);
         }
       },
       methods: {
-        Debug: function(event) {
-          console.log(event);
+        HighlightRoute: function(event, id) {
+          switch (event) {
+            case 'hover':
+              if (!this.route_drawn) {
+                this.DrawRoute(this.routes[id]);              
+                this.route_drawn = true;
+              }
+              break;
+          
+            case 'leave':
+              this.RemoveLines();
+              this.route_drawn = false;
+              break;
+
+            default:
+              console.log('error');
+              break;
+          }
         },
         DrawRoute: function(route) {
           var steps = route.steps;
@@ -281,12 +295,11 @@
             }
 
           });
-          
-          console.log(steps)
         },
 
-        SelectRoute: function (event) {
-          console.log('Select route #' + event);
+        SelectRoute: function (id) {
+          this.DrawRoute(this.routes[id]);              
+          this.route_drawn = true;
         },
         UpdateSearchMethod: function (event) {
           this.search_type = event.target.value;
