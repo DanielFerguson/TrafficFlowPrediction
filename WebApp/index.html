@@ -129,10 +129,11 @@
           </div>
 
           <div>
-            <div class="card option-card mb-3" v-for="i in 5">
-              <div class="card-body option-card-body" :option="'option' + i" @click="SelectRoute(i)">
-                <h3 class="card-title">Route #{{i}}</h3>
-                <h6 class="card-subtitle text-muted">Distance: 24.32kms</h6>
+            <div class="card option-card mb-3" v-for="(route, index) in routes" :key="index">
+              <div class="card-body option-card-body" @click="SelectRoute(route)" @mouseover="Debug({event: 'hover'})" @mouseleave="Debug({event: 'leave'})">
+                <h3 class="card-title">Route #{{ index + 1 }}</h3>
+                <h6 class="card-subtitle text-muted">Distance: {{ route.distance.toFixed(2) }}kms</h6>
+                <h6 class="card-subtitle text-muted">Complexity: {{ route.steps.length }} steps</h6>
                 <h6 class="card-subtitle text-muted">Estimated Time: 12mins</h6>
               </div>
             </div>
@@ -242,13 +243,48 @@
             [result.nearest.lat, result.nearest.lng]
           ], 'red', true);
 
-          // Generate routes
+          // Generate Routes
           for (let i = 0; i < 5; i++) {
-            this.routes.push(this.GenerateRoute());
+            var generated_seed = this.GenerateSeededStart();
+            this.routes.push(this.FindPathBetweenPoints(generated_seed, this.exit_point));
           }
+
+          // DEBUG
+          // Draw the first route as a test for hovering over the routes
+          this.DrawRoute(this.routes[0]);
         }
       },
       methods: {
+        Debug: function(event) {
+          console.log(event);
+        },
+        DrawRoute: function(route) {
+          var steps = route.steps;
+
+          var current_step = _.find(groups, ['scat_id', steps[0]]);
+
+          steps.forEach(step => {
+            // Skip over the first & last steps
+            if (step != current_step) {
+              // Draw a line between the current_point and the step object
+              var obj = _.find(groups, ['scat_id', step]);
+
+              this.DrawLine([
+                  [current_step.lat,  current_step.lng],
+                  [obj.lat,           obj.lng]
+                ],
+                'blue',
+                false
+              );
+
+              current_step = obj;
+            }
+
+          });
+          
+          console.log(steps)
+        },
+
         SelectRoute: function (event) {
           console.log('Select route #' + event);
         },
@@ -257,32 +293,31 @@
         },
 
 
-        GenerateRoute: function () {
+        // Version 2
+        GenerateSeededStart: function () {
           var starting_point = this.entry_point;
           var current_point = starting_point;
 
-          var steps = [starting_point]; // A list of all nodes travelled to/from, initalized with entry point
+          var steps = [starting_point.scat_id]; // A list of all nodes travelled to/from, initalized with entry point
           var total_distance = 0; // Total distance travelled
 
           // Generate Seeded Starting Point
-          var num_steps = Math.floor(Math.random() * 5) + 1; // Generates a random int between 0 to 5
+          var num_steps = Math.floor(Math.random() * 6) + 1; // Generates a random int between 1 to 6
           var step_index = 0; // Current index
 
+          var next_point_id = null;
+
+          // First - Find the next point
           for (let i = 0; i < num_steps; i++) {
-            // First - Find the next point
-            var next_point_id = null;
+            var num_neighbours = current_point.neighbours.length;
+            var neighbour_selection = Math.floor(Math.random() * (num_neighbours));
 
-            if (starting_point.neighbours.length == 1) {
-              // If only one neighbour, traverse to that neighbour
-              next_point_id = current_point.neighbours[0];
-
-            } else {
-              // If there are more than one neighbour, pick a random direction to go  
-              var num_neighbours = current_point.neighbours.length;
-              var neighbour_selection = Math.floor(Math.random() * (num_neighbours + 1));
-
-              next_point_id = current_point.neighbours[neighbour_selection];
+            while (steps.includes(current_point.neighbours[neighbour_selection])) {
+              console.log("Found similar: " + current_point.neighbours[neighbour_selection]);
+              neighbour_selection = Math.floor(Math.random() * (num_neighbours));
             }
+
+            next_point_id = current_point.neighbours[neighbour_selection];
 
             // Get the object for the scat_id
             var next_point_obj = _.find(groups, ['scat_id', next_point_id]);
@@ -297,72 +332,79 @@
             current_point = next_point_obj;
           }
 
-          // Second - Find the quickest path from seeded location
-          var next_point_id = null;
+          return { steps: steps, distance: total_distance };
+        },
 
-          while (current_point != this.exit_point) {
-            if (current_point.neighbours.includes(this.exit_point.scat_id)) {
-              // Check if one of the neighbours is the end point
+        FindPathBetweenPoints: function (start, exit) {
+          var steps = start.steps;      // From generated seeded start'
+          var distance = start.distance // Already traversed distance
 
-              // Get the object for the scat_id
-              var next_point_obj = this.exit_point;
+          var start_point = _.find(groups, ['scat_id', start.steps[-1]]); // Find the latest point
 
-              // Find the distance between current_point --> next_point, record it in total_distance
-              total_distance += this.CalculateDistance([next_point_obj.lat, next_point_obj.lng], [current_point.lat, current_point.lng]);
+          var current_point = null;
+          var index = 0;
 
-              // Push the record of the traversal onto steps
-              steps.push(next_point_id);
+          steps.forEach(step => {
+            // Check that this point is not the last point in the steps array, to stop overflows
+            if (step != steps[steps.length - 1]) {
+              // Find the current point, if null
+              if (current_point == null) {
+                current_point = _.find(groups, ['scat_id', step]);
+              }
 
-              // Set the current_point to the found object of the next_point in groups
-              current_point = next_point_obj;
+              // Find the point after this one
+              var next_point = _.find(groups, ['scat_id', steps[index + 1]]);
 
-            } else if (current_point.neighbours.length == 1) {
-
-              // If only one neighbour, traverse to that neighbour
-              next_point_id = current_point.neighbours[0];
-
-            } else {
-              // There are more than 1 neighbours, evaluate which is closest to line
-
-              // Generate a Line of Sight from the point; this will help us make informed decisions about 
-              // the best neighbour to traverse to
-              var los_line = turf.lineString([
-                [current_point.lat, current_point.lng],
-                [this.exit_point.lat, this.exit_point.lng]
-              ]);
-
-              // TODO: Check that this isnt the previous step (stopping a potential infinite loop).
-              var closest_distance = 100;
-
-              current_point.neighbours.forEach(n_id => {
-                var n_obj = _.find(groups, ['scat_id', n_id]);
-
-                var dist_to_end = this.CalculateDistance(
-                  [parseFloat(n_obj.lat), parseFloat(n_obj.lng)], 
-                  [this.exit_point.lat, this.exit_point.lng]
-                );
-
-                if (dist_to_end < closest_distance) {
-                  next_point_id = n_id;
-                }
-              });
-
-              // Get the object for the scat_id
-              var next_point_obj = _.find(groups, ['scat_id', next_point_id]);
-
-              // Find the distance between current_point --> next_point, record it in total_distance
-              total_distance += this.CalculateDistance([next_point_obj.lat, next_point_obj.lng], [current_point.lat, current_point.lng]);
-
-              // Push the record of the traversal onto steps
-              steps.push(next_point_id);
-
-              // Set the current_point to the found object of the next_point in groups
-              current_point = next_point_obj;
+              // Update the current_point with the next_point, along with index
+              current_point = next_point;
+              index++;
             }
+          });
 
+          // Create path to exit_point using 'As the Crow Flies' method
+          var control_index = 0;
+          var temp_steps = [];
+
+          var temp_point = current_point;
+          console.log('Current Point: ' + current_point.scat_id);
+
+          while (control_index <= 25 && temp_point.scat_id != exit.scat_id) {
+            // Find the closest point to the exit
+            var targetPoint = turf.point([exit.lat, exit.lng]);
+
+            var _points = [];
+            temp_point.neighbours.forEach(n_id => {
+              var obj = _.find(groups, ['scat_id', n_id]);
+
+              _points.push(
+                turf.point([obj.lat, obj.lng])
+              );
+            });
+
+            var points = turf.featureCollection(_points);
+            var nearest = turf.nearestPoint(targetPoint, points);
+            var nearest_index = nearest.properties.featureIndex;
+
+            var next_point = _.find(groups, ['scat_id', temp_point.neighbours[nearest_index]])
+
+            // Increment distance & record step 
+            distance += this.CalculateDistance([next_point.lat, next_point.lng], [temp_point.lat, temp_point.lng]);
+            steps.push(next_point.scat_id);
+
+            temp_point = next_point;
+
+            // Increment the control index to ensure no freezing
+            control_index++;
           }
 
-          return {'steps': steps, 'distance': total_distance};
+          if (temp_point.scat_id == exit.scat_id) {
+            console.log('FOUND EXIT IN ' + control_index + ' STEPS!');
+            console.log('Distance: ' + distance.toFixed(2));
+            console.log('Steps');
+            console.log(steps);
+          }
+
+          return { steps: steps, distance: distance };
         },
 
         // Accumulative Function
