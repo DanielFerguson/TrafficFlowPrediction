@@ -14,4 +14,9 @@ steps:
   inputs:
     rootFolderOrFile: '$(build.sourcesDirectory)/WebApp'
     includeRootFolder: false
+
 - task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'BuildPackage'
+    publishLocation: 'Container'
