@@ -90,12 +90,12 @@
                 </select>
               </div>
 
-              <div class="col-3 text-center">
+              <!-- <div class="col-3 text-center">
                 <select class="custom-select mr-sm-2" @change="UpdateSearchMethod($event)">
                   <option selected value="location">Location</option>
                   <option value="scat">SCAT Site</option>
                 </select>
-              </div>
+              </div> -->
             </div>
           </div>
         </div>
@@ -130,11 +130,22 @@
 
           <div>
             <div class="card option-card mb-3" v-for="(route, index) in routes" :key="index">
-              <div class="card-body option-card-body" @click="SelectRoute(index)" @mouseover="HighlightRoute('hover', index)" @mouseleave="HighlightRoute('leave')">
-                <h3 class="card-title">Route #{{ index + 1 }}</h3>
-                <h6 class="card-subtitle text-muted">Distance: {{ route.distance.toFixed(2) }}kms</h6>
-                <h6 class="card-subtitle text-muted">Complexity: {{ route.steps.length }} steps</h6>
-                <h6 class="card-subtitle text-muted">Estimated Time: 12mins</h6>
+              <div class="card-body option-card-body" @click="SelectRoute(index)"
+                @mouseover="HighlightRoute('hover', index)" @mouseleave="HighlightRoute('leave')">
+                <div class="row">
+                  <div class="col-6">
+                    <h3 class="card-title">Route #{{ index + 1 }}</h3>
+                  </div>
+                  <div class="col-2 my-auto">
+                    <h6 class="card-subtitle text-muted">{{ route.distance.toFixed(2) }}kms</h6>
+                  </div>
+                  <div class="col-2 my-auto">
+                    <h6 class="card-subtitle text-muted">{{ route.steps.length }} steps</h6>
+                  </div>
+                  <div class="col-2 my-auto">
+                    <h6 class="card-subtitle text-muted">12mins</h6>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -143,8 +154,6 @@
     </v-app>
   </div>
   <script>
-    // CICD Test
-
     var userSetIcon = L.icon({
       iconUrl: './assets/red_marker.png',
       iconSize: [36, 41],
@@ -154,6 +163,7 @@
     });
 
     var paths = [];
+    var selected_route_path = [];
     var temp_paths = [];
 
     var options = [];
@@ -176,6 +186,7 @@
         map: null,
 
         route_drawn: false,
+        selected_route_drawn: false,
 
         search_type: 'location',
 
@@ -226,7 +237,7 @@
           this.DrawLine([
             [lat, lng],
             [result.nearest.lat, result.nearest.lng]
-          ], 'red', true);
+          ], 'blue', 'static', '0.4');
         },
         search_destination: function () {
           var lat = this.search_destination.geometry.coordinates[1];
@@ -245,7 +256,7 @@
           this.DrawLine([
             [lat, lng],
             [result.nearest.lat, result.nearest.lng]
-          ], 'red', true);
+          ], 'blue', 'static', '0.4');
 
           // Generate Routes
           for (let i = 0; i < 5; i++) {
@@ -255,15 +266,15 @@
         }
       },
       methods: {
-        HighlightRoute: function(event, id) {
+        HighlightRoute: function (event, id) {
           switch (event) {
             case 'hover':
               if (!this.route_drawn) {
-                this.DrawRoute(this.routes[id]);              
+                this.DrawRoute(this.routes[id]);
                 this.route_drawn = true;
               }
               break;
-          
+
             case 'leave':
               this.RemoveLines();
               this.route_drawn = false;
@@ -274,9 +285,11 @@
               break;
           }
         },
-        DrawRoute: function(route) {
+        DrawRoute: function (route, selected) {
           var steps = route.steps;
 
+          var _selected = selected ? 'selected' : 'highlight';
+          var _opacity = selected ? '1.0' : '0.4';
           var current_step = _.find(groups, ['scat_id', steps[0]]);
 
           steps.forEach(step => {
@@ -286,22 +299,25 @@
               var obj = _.find(groups, ['scat_id', step]);
 
               this.DrawLine([
-                  [current_step.lat,  current_step.lng],
-                  [obj.lat,           obj.lng]
-                ],
+                [current_step.lat, current_step.lng],
+                [obj.lat, obj.lng]
+              ],
                 'blue',
-                false
+                _selected,
+                _opacity
               );
-
               current_step = obj;
             }
-
           });
         },
 
         SelectRoute: function (id) {
-          this.DrawRoute(this.routes[id]);              
+          // Clear the previously drawn selected route
+          this.RemoveSelectedRoute();
+
           this.route_drawn = true;
+          this.selected_route_drawn = true;
+          this.DrawRoute(this.routes[id], true);
         },
         UpdateSearchMethod: function (event) {
           this.search_type = event.target.value;
@@ -381,8 +397,6 @@
           var temp_steps = [];
 
           var temp_point = current_point;
-          console.log('Current Point: ' + current_point.scat_id);
-
           while (control_index <= 25 && temp_point.scat_id != exit.scat_id) {
             // Find the closest point to the exit
             var targetPoint = turf.point([exit.lat, exit.lng]);
@@ -410,13 +424,6 @@
 
             // Increment the control index to ensure no freezing
             control_index++;
-          }
-
-          if (temp_point.scat_id == exit.scat_id) {
-            console.log('FOUND EXIT IN ' + control_index + ' STEPS!');
-            console.log('Distance: ' + distance.toFixed(2));
-            console.log('Steps');
-            console.log(steps);
           }
 
           return { steps: steps, distance: distance };
@@ -467,7 +474,7 @@
             this.DrawLine([
               [obj.lat, obj.lng],
               [n_obj.lat, n_obj.lng]
-            ], 'blue', false);
+            ], 'blue', 'highlight', '0.2');
           });
         },
 
@@ -505,21 +512,43 @@
 
           return turf.distance(from, to, options);
         },
-        DrawLine: function (latlngs, colour, notTemp) {
+        DrawLine: function (latlngs, colour, type, opacity) {
           var pointOne = [parseFloat(latlngs[0][0]), parseFloat(latlngs[0][1])];
           var pointTwo = [parseFloat(latlngs[1][0]), parseFloat(latlngs[1][1])];
 
-          var l = L.polyline([latlngs], {
-            color: colour
-          }).bindPopup("Distance: <b>" + this.CalculateDistance(pointOne, pointTwo).toFixed(2) + "kms</b>").addTo(this.map);
+          if (opacity) {
+            var l = L.polyline([latlngs], {
+              color: colour,
+              opacity: opacity,
+            }).bindPopup("Distance: <b>" + this.CalculateDistance(pointOne, pointTwo).toFixed(2) + "kms</b>").addTo(this.map);
+          } else {
+            var l = L.polyline([latlngs], {
+              color: colour
+            }).bindPopup("Distance: <b>" + this.CalculateDistance(pointOne, pointTwo).toFixed(2) + "kms</b>").addTo(this.map);
+          }
 
           // If temp (starting/ending lines) verticies, add to the temp directory 
-          notTemp
-            ? paths.push(l)
-            : temp_paths.push(l);
+          switch (type) {
+            case 'highlight':
+              temp_paths.push(l)
+              break;
+
+            case 'static':
+              paths.push(l)
+              break;
+
+            case 'selected':
+              selected_route_path.push(l)
+              break;
+          }
         },
         RemoveLines: function () {
           temp_paths.forEach(path => {
+            this.map.removeLayer(path);
+          });
+        },
+        RemoveSelectedRoute: function () {
+          selected_route_path.forEach(path => {
             this.map.removeLayer(path);
           });
         },
