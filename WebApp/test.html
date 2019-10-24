@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Test Web Page</title>
+
+  <!-- Tensorflow JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.0/dist/tf.min.js"></script>
+</head>
+
+<body>
+
+  <div id="app">
+    <h1>Testing Environment</h1>
+    <p>
+      This is a test of the H5 Model load and operation
+    </p>
+    <p id="test"></p>
+  </div>
+
+  <script>
+    // Load the model
+    var model = null;
+    async function init() {
+      model = await tf.loadLayersModel('models/970_1/model.json');
+      tf.from
+      model.predict(model.predict(tf.ones([2, 5, 2, 5, 2, 5, 2, 5, 2, 5, 2, 5])).print());
+    }
+
+    init();
+  </script>
+
+</body>
+
+</html>
