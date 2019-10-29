@@ -3,6 +3,7 @@ Traffic Flow Prediction with Neural Networks(SAEs、LSTM、GRU).
 """
 import math
 import warnings
+import os
 import numpy as np
 import pandas as pd
 from data.data2 import process_data
@@ -96,26 +97,36 @@ def plot_results(y_true, y_preds, names):
 
 def main():
 
-
     parser = argparse.ArgumentParser()
     parser.add_argument("--lag", default="12", help="lags")
-    parser.add_argument("--model", default="model/lstm.h5", help="lags")   
+    parser.add_argument("--model", default="970_1_data.csv", help="lags")   
     args = parser.parse_args()
     lag = int(args.lag)
+    model_name = args.model
+    model_name = os.path.splitext(model_name)[0]
 
-
-    lstm = load_model('model/{}_lstm.h5'.format(args.model))
-    gru = load_model('model/{}_gru.h5'.format(args.model))
-    saes = load_model('model/{}_saes.h5'.format(args.model))
-    models = [lstm, gru]
-    names = ['LSTM', 'GRU']
+    lstm = load_model('model/{}_lstm.h5'.format(model_name))
+    # gru = load_model('model/{}_gru.h5'.format(args.model))
+    # saes = load_model('model/{}_saes.h5'.format(args.model))
+    models = [lstm]
+    names = ['LSTM']
 
     lag = 12
-    file = '970_1_data.csv'
+    file = '{}.csv'.format(model_name)
     _, _, X_test, y_test, scaler = process_data(file, lag)
-    print(y_test.shape)
+    minimum = scaler.data_min_
+    maximum = scaler.data_max_
+    scale = scaler.scale_
+    scaled = (maximum * (scale * X_test[0]  - minimum * scale))
+    unscalaed = (scaled + (minimum * scale))/scale
     y_test = scaler.inverse_transform(y_test.reshape(-1, 1)).reshape(1, -1)[0]
-    print(y_test.shape)
+    X_test_2 = scaler.inverse_transform(X_test.reshape(-1, 1)).reshape(1, -1)[0]
+    print(X_test[0].shape)
+
+    with open('scaler_data/{}.txt'.format(model_name), 'w') as output:
+        output.write('{},{},{}'.format(scale[0],minimum[0],maximum[0]))
+
+    # print(y_test.shape)
 
     y_preds = []
     for name, model in zip(names, models):
@@ -131,7 +142,7 @@ def main():
         print(name)
         eva_regress(y_test, predicted)
 
-    plot_results(y_test[:384], y_preds, names)
+    # plot_results(y_test[:384], y_preds, names)
 
 
 if __name__ == '__main__':
