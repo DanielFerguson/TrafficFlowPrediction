@@ -595,6 +595,7 @@
             return await tf.loadLayersModel('models/' + scat_id + '/model.json');
           }
       
+          
           var traffic_data = [0.63777778, 0.46666667, 0.39333333, 0.48666667, 0.34666667, 0.29333333, 0.3, 0.30444444, 0.29111111, 0.26222222, 0.27555556, 0.28444444]
           var rain_data = [0,0,0,0,0,0,0,0,0,0,0,0]
           var day = [0,0,0,0,0,0,0,0,0,0,0,0]
@@ -606,7 +607,7 @@
           var tensor = tf.tensor([[traffic_data, rain_data, day]]);
             
           var tv_scaled = await model.predict(tensor).array();
-          await axios.get('http://traffic.local/scaler_data/' + scat_id + '.txt').then((response) => { scale = response.data.split(',')[0]; })
+          await axios.get('/scaler_data/' + scat_id + '.txt').then((response) => { scale = response.data.split(',')[0]; })
       
           return tv_scaled[0] / parseFloat(scale);
         }
