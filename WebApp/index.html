@@ -239,7 +239,7 @@
             [result.nearest.lat, result.nearest.lng]
           ], 'blue', 'static', '0.4');
         },
-        search_destination: function () {
+        search_destination: async function () {
           var lat = this.search_destination.geometry.coordinates[1];
           var lng = this.search_destination.geometry.coordinates[0];
 
@@ -260,12 +260,16 @@
 
           // Generate Routes
           for (let i = 0; i < 5; i++) {
-            var generated_seed = this.GenerateSeededStart();
-            this.routes.push(this.FindPathBetweenPoints(generated_seed, this.exit_point));
+            var generated_seed = await this.GenerateSeededStart();
+            
+            await this.FindPathBetweenPoints(generated_seed, this.exit_point).then((res) => {
+              this.routes.push(res);
+            });
           }
         }
       },
       methods: {
+        // UI Functions
         HighlightRoute: function (event, id) {
           switch (event) {
             case 'hover':
@@ -310,7 +314,6 @@
             }
           });
         },
-
         SelectRoute: function (id) {
           // Clear the previously drawn selected route
           this.RemoveSelectedRoute();
@@ -323,14 +326,14 @@
           this.search_type = event.target.value;
         },
 
-
-        // Version 2
-        GenerateSeededStart: function () {
+        // Routing Functions
+        GenerateSeededStart: async function () {
           var starting_point = this.entry_point;
           var current_point = starting_point;
 
           var steps = [starting_point.scat_id]; // A list of all nodes travelled to/from, initalized with entry point
           var total_distance = 0; // Total distance travelled
+          var total_traffic_volume = 0; // Total traffic volume
 
           // Generate Seeded Starting Point
           var num_steps = Math.floor(Math.random() * 6) + 1; // Generates a random int between 1 to 6
@@ -344,7 +347,6 @@
             var neighbour_selection = Math.floor(Math.random() * (num_neighbours));
 
             while (steps.includes(current_point.neighbours[neighbour_selection])) {
-              console.log("Found similar: " + current_point.neighbours[neighbour_selection]);
               neighbour_selection = Math.floor(Math.random() * (num_neighbours));
             }
 
@@ -356,6 +358,9 @@
             // Find the distance between current_point --> next_point, record it in total_distance
             total_distance += this.CalculateDistance([next_point_obj.lat, next_point_obj.lng], [current_point.lat, current_point.lng]);
 
+            // Find the traffic volume between points
+            total_traffic_volume += await this.GetTrafficVolume(current_point.scat_id);
+
             // Push the record of the traversal onto steps
             steps.push(next_point_id);
 
@@ -363,12 +368,13 @@
             current_point = next_point_obj;
           }
 
-          return { steps: steps, distance: total_distance };
+          return { steps: steps, distance: total_distance, volume: total_traffic_volume };
+          // return { steps: steps, distance: total_distance };
         },
-
-        FindPathBetweenPoints: function (start, exit) {
+        FindPathBetweenPoints: async function (start, exit) {
           var steps = start.steps;      // From generated seeded start'
           var distance = start.distance // Already traversed distance
+          var traffic_volume = start.volume // Already observed traffic volume
 
           var start_point = _.find(groups, ['scat_id', start.steps[-1]]); // Find the latest point
 
@@ -418,6 +424,7 @@
 
             // Increment distance & record step 
             distance += this.CalculateDistance([next_point.lat, next_point.lng], [temp_point.lat, temp_point.lng]);
+            traffic_volume += await this.GetTrafficVolume(temp_point.scat_id);
             steps.push(next_point.scat_id);
 
             temp_point = next_point;
@@ -426,10 +433,10 @@
             control_index++;
           }
 
-          return { steps: steps, distance: distance };
+          return { steps: steps, distance: distance, volume: traffic_volume };
         },
 
-        // Accumulative Function
+        // Accumulative Functions
         InitialiseMap: function () {
           this.map = L.map('mapid', {
             zoomControl: false
@@ -576,6 +583,32 @@
               })
               .catch((error) => (console.log(error)))
           }
+        },
+
+        // Machine Learning Functions
+        GetModel: async function() {
+          return await tf.loadLayersModel('models/' + scat_id + '/model.json');
+        },
+        GetTrafficVolume: async function(scat_id) {
+          // Load the model
+          async function GetModel() {
+            return await tf.loadLayersModel('models/' + scat_id + '/model.json');
+          }
+      
+          var traffic_data = [0.63777778, 0.46666667, 0.39333333, 0.48666667, 0.34666667, 0.29333333, 0.3, 0.30444444, 0.29111111, 0.26222222, 0.27555556, 0.28444444]
+          var rain_data = [0,0,0,0,0,0,0,0,0,0,0,0]
+          var day = [0,0,0,0,0,0,0,0,0,0,0,0]
+      
+          var scale = null;
+
+          // Create model and data to predict on
+          var model = await GetModel();
+          var tensor = tf.tensor([[traffic_data, rain_data, day]]);
+            
+          var tv_scaled = await model.predict(tensor).array();
+          await axios.get('http://traffic.local/scaler_data/' + scat_id + '.txt').then((response) => { scale = response.data.split(',')[0]; })
+      
+          return tv_scaled[0] / parseFloat(scale);
         }
       }
     })
