@@ -9,6 +9,9 @@
 
   <!-- Tensorflow JS -->
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.0/dist/tf.min.js"></script>
+
+  <!-- Axios -->
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 </head>
 
 <body>
@@ -22,22 +25,46 @@
   </div>
 
   <script>
-    // Load the model
-    var model = null;
-    async function init() {
-      model = await tf.loadLayersModel('models/970_1/model.json');
-
+    function getTrafficVolume(scat_id) {
+      // Load the model
+      async function getModel() {
+        return await tf.loadLayersModel('models/' + scat_id + '/model.json');
+      }
+  
       var traffic_data = [0.63777778, 0.46666667, 0.39333333, 0.48666667, 0.34666667, 0.29333333, 0.3, 0.30444444, 0.29111111, 0.26222222, 0.27555556, 0.28444444]
       var rain_data = [0,0,0,0,0,0,0,0,0,0,0,0]
       var day = [0,0,0,0,0,0,0,0,0,0,0,0]
-
-
-      var data = tf.tensor([[traffic_data,rain_data,day]]);
-
-      model.predict(model.predict(data).print());
+  
+      var model = null;
+      var tensor = null;
+  
+      var tv_scaled = null;
+      var scale = null;
+  
+      var traffic_volume = null;
+  
+      getModel().then((m) => {
+        model = m
+        tensor = tf.tensor([[traffic_data, rain_data, day]]);
+        
+        model.predict(tensor).array().then(val => { 
+          tv_scaled = val;
+        }).then(() => {
+          
+          axios.get('/scaler_data/' + scat_id + '_data.txt')
+          .then((response) => {
+            scale = response.data.split(',')[0];
+  
+            traffic_volume = tv_scaled[0] / parseFloat(scale);
+            console.log(traffic_volume)
+          })
+        })
+      })
     }
 
-    init();
+    getTrafficVolume('970');
+
+    
   </script>
 
 </body>
