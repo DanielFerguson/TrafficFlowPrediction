@@ -69,24 +69,33 @@
 
             <div class="row">
               <div class="col-2">
-                <input type="number" id="inputHour" value="10" class="form-control">
+                <input class="form-control" v-model.number="time_hour" type="number" id="inputHour" value="10" min="0" max="23">
               </div>
 
               <div class="col-2">
-                <input type="number" id="inputHour" value="30" class="form-control">
+                <input class="form-control" v-model.number="time_min" type="number" id="inputHour" value="30" min="0" max="59">
               </div>
 
-              <div class="col-2 text-center">
-                <select class="custom-select mr-sm-2">
-                  <option selected value="AM">AM</option>
-                  <option value="PM">PM</option>
+              <div class="col-4 offset-1">
+                Rainfall
+                <select v-model.number="selected_rainfall" class="custom-select mr-sm-2">
+                  <option value="0">0</option>
+                  <option value="2">2mm</option>
+                  <option value="5">5mm</option>
+                  <option value="10">10mm</option>
+                  <option value="20">20mm</option>
                 </select>
               </div>
 
               <div class="col-3 text-center">
-                <select class="custom-select mr-sm-2">
-                  <option selected value="weekday">Weekday</option>
-                  <option value="weekend">Weekend</option>
+                <select v-model="selected_day" class="custom-select mr-sm-2">
+                  <option value="monday">Monday</option>
+                  <option value="tuesday">Tuesday</option>
+                  <option value="wednesday">Wednesday</option>
+                  <option value="thursday">Thursday</option>
+                  <option value="friday">Friday</option>
+                  <option value="saturday">Saturday</option>
+                  <option value="sunday">Sunday</option>
                 </select>
               </div>
 
@@ -193,6 +202,11 @@
         entry_point: null,
         exit_point: null,
 
+        selected_day: "monday",
+        selected_rainfall: 0,
+        time_hour: 10,
+        time_min: 30,
+
         routes: [],
 
         final_distance: null,
@@ -261,7 +275,7 @@
           // Generate Routes
           for (let i = 0; i < 5; i++) {
             var generated_seed = await this.GenerateSeededStart();
-            
+
             await this.FindPathBetweenPoints(generated_seed, this.exit_point).then((res) => {
               this.routes.push(res);
             });
@@ -585,31 +599,115 @@
           }
         },
 
+        // General Functions
+        ConvertDayToIndex: function () {
+          // Convert the selected day into an index
+          switch (this.selected_day) {
+            case "monday":
+              return 0;
+              break;
+
+            case "tuesday":
+              return 1;
+              break;
+
+            case "wednesday":
+              return 2;
+              break;
+
+            case "thursday":
+              return 3;
+              break;
+
+            case "friday":
+              return 4;
+              break;
+
+            case "saturday":
+              return 5;
+              break;
+
+            case "sunday":
+              return 5;
+              break;
+          }
+        },
+        ConvertTimeToNummber: function () {
+          // Convert the selected time into an amount of 15 minute integers
+          return ((this.time_hour * 4) + Math.round(this.time_min / 15));
+        },
+        CreateRainArray: function() {
+          var _list = [];
+
+          for (let i = 0; i < 12; i++) {
+            _list.push(this.selected_rainfall);
+          }
+
+          return _list;
+        },
+
         // Machine Learning Functions
-        GetModel: async function() {
+        GetModel: async function (scat_id, day, time) {
           return await tf.loadLayersModel('models/' + scat_id + '/model.json');
         },
-        GetTrafficVolume: async function(scat_id) {
-          // Load the model
-          async function GetModel() {
-            return await tf.loadLayersModel('models/' + scat_id + '/model.json');
-          }
-      
-          
-          var traffic_data = [0.63777778, 0.46666667, 0.39333333, 0.48666667, 0.34666667, 0.29333333, 0.3, 0.30444444, 0.29111111, 0.26222222, 0.27555556, 0.28444444]
-          var rain_data = [0,0,0,0,0,0,0,0,0,0,0,0]
-          var day = [0,0,0,0,0,0,0,0,0,0,0,0]
-      
-          var scale = null;
+        GetTrafficData: async function (scat_id, day, time) {
+          // Retrieve traffic data from file
+          var results = await axios.get('traffic_data/' + scat_id + '.csv').then((response) => { return response.data.split(','); });
+
+          // Chunk results into 95 values to represent each day
+          results = _.chunk(results, 95)
+
+          // Get the 12 previous records to predict on
+          var day_index = this.ConvertDayToIndex();
+          var time_num = this.ConvertTimeToNummber();
+
+          // Slice the array for the day and 
+          results = _.slice(results[day_index], time_num - 12, time_num);
+
+          return results;
+        },
+        GetTrafficVolume: async function (scat_id, day, time) {
+          // var traffic_data = [0.63777778, 0.46666667, 0.39333333, 0.48666667, 0.34666667, 0.29333333, 0.3, 0.30444444, 0.29111111, 0.26222222, 0.27555556, 0.28444444]
+          // var rain_data = [0,0,0,0,0,0,0,0,0,0,0,0];
+          // var day = [0,0,0,0,0,0,0,0,0,0,0,0];
+
+          // Retrieve the scale factor, minimum and maximum scaler data for the location
+          var csv_values = await axios.get('/scaler_data/' + scat_id + '.txt').then((response) => { return response.data.split(','); });
+
+          var scale = parseFloat(csv_values[0]);
+          var minimum = parseFloat(csv_values[1]);
+          var maximum = parseFloat(csv_values[2]);
+
+          // Retrieve the previous 12 records of traffic data - non scaled
+          var raw_traffic = await this.GetTrafficData(scat_id, day, time);
+          var traffic = [];
+
+          // Convert each of the raw_traffic records to scaled values
+          raw_traffic.forEach(record => {
+            traffic.push(maximum * (scale * record - minimum * scale));
+          });
+
+          console.log(csv_values)
+          console.log(raw_traffic)
+          console.log(traffic)
+
+          // Create rain & day array
+          var rain = this.CreateRainArray();
+          var day = [0,0,0,0,0,0,0,0,0,0,0,0];
+
 
           // Create model and data to predict on
-          var model = await GetModel();
-          var tensor = tf.tensor([[traffic_data, rain_data, day]]);
-            
-          var tv_scaled = await model.predict(tensor).array();
-          await axios.get('/scaler_data/' + scat_id + '.txt').then((response) => { scale = response.data.split(',')[0]; })
-      
-          return tv_scaled[0] / parseFloat(scale);
+          var model = await this.GetModel(scat_id);
+
+          return 0;
+
+          // // Create data Tensor to pass into model prediction, and then predict on the data with the fetched model
+          // var tensor = tf.tensor([[traffic, rain, day]]);
+          // var prediction = await model.predict(tensor).array();
+
+          // // Return the unscaled predictions
+          // // Formula is Unscaled Value = (Scaled Value + (Minimum Value * Scale))/Scale
+          // return (parseFloat(prediction) + (parseFloat(minimum) * parseFloat(scale))) / parseFloat(scale);
         }
       }
     })
