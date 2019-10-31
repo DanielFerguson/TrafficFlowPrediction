@@ -69,11 +69,13 @@
 
             <div class="row">
               <div class="col-2">
-                <input class="form-control" v-model.number="time_hour" type="number" id="inputHour" value="10" min="0" max="23">
+                <input class="form-control" v-model.number="time_hour" type="number" id="inputHour" value="10" min="0"
+                  max="23">
               </div>
 
               <div class="col-2">
-                <input class="form-control" v-model.number="time_min" type="number" id="inputHour" value="30" min="0" max="59">
+                <input class="form-control" v-model.number="time_min" type="number" id="inputHour" value="30" min="0"
+                  max="59">
               </div>
 
               <div class="col-4 offset-1">
@@ -636,7 +638,7 @@
           // Convert the selected time into an amount of 15 minute integers
           return ((this.time_hour * 4) + Math.round(this.time_min / 15));
         },
-        CreateRainArray: function() {
+        CreateRainArray: function () {
           var _list = [];
 
           for (let i = 0; i < 12; i++) {
@@ -684,30 +686,28 @@
 
           // Convert each of the raw_traffic records to scaled values
           raw_traffic.forEach(record => {
-            traffic.push(maximum * (scale * record - minimum * scale));
+            traffic.push((scale * record - minimum * scale));
           });
-
-          console.log(csv_values)
-          console.log(raw_traffic)
-          console.log(traffic)
 
           // Create rain & day array
           var rain = this.CreateRainArray();
-          var day = [0,0,0,0,0,0,0,0,0,0,0,0];
 
+          // If it's a weekend, day == 1 else day == 0
+          var day = null;
+          (this.selected_day == 'saturday' || this.selected_day == 'sunday')
+            ? day = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+            : day = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
           // Create model and data to predict on
           var model = await this.GetModel(scat_id);
 
-          return 0;
+          // Create data Tensor to pass into model prediction, and then predict on the data with the fetched model
+          var tensor = tf.tensor([[traffic, rain, day]]);
+          var prediction = await model.predict(tensor).array();
 
-          // // Create data Tensor to pass into model prediction, and then predict on the data with the fetched model
-          // var tensor = tf.tensor([[traffic, rain, day]]);
-          // var prediction = await model.predict(tensor).array();
-
-          // // Return the unscaled predictions
-          // // Formula is Unscaled Value = (Scaled Value + (Minimum Value * Scale))/Scale
-          // return (parseFloat(prediction) + (parseFloat(minimum) * parseFloat(scale))) / parseFloat(scale);
+          // Return the unscaled predictions
+          // Formula is Unscaled Value = (Scaled Value + (Minimum Value * Scale))/Scale
+          return (parseFloat(prediction) + (parseFloat(minimum) * parseFloat(scale))) / parseFloat(scale);
         }
       }
     })
