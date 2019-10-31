@@ -12,6 +12,10 @@ import sklearn.metrics as metrics
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import argparse
+import pickle
+import xgboost as xgb
+import os
+
 warnings.filterwarnings("ignore")
 
 
@@ -97,15 +101,21 @@ def plot_results(y_true, y_preds, names):
 def main():
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--lag", default="12", help="lags")    
+    parser.add_argument("--lag", default="12", help="lags")
+    parser.add_argument("--model", default="970_1_data.csv", help="lags")   
     args = parser.parse_args()
     lag = int(args.lag)
+    model_name = args.model
+    model_name = os.path.splitext(model_name)[0]
 
     lstm = load_model('model/lstm.h5')
     gru = load_model('model/gru.h5')
     saes = load_model('model/saes.h5')
-    models = [lstm, gru, saes]
-    names = ['LSTM', 'GRU', 'SAEs']
+    knn = pickle.load(open('model/knn.model', 'rb'))
+    xgboost = xgb.Booster({'nthread': 4})  # init model
+    xgboost.load_model('model/xgb.model')
+    models = [lstm, gru, saes,knn,xgboost]
+    names = ['LSTM', 'GRU', 'SAEs','KNN','Xgboost']
 
     lag = 12
     file = '970_1_data.csv'
@@ -118,10 +128,12 @@ def main():
     for name, model in zip(names, models):
         if name == 'SAEs':
             X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1]))
-        else:
+        elif name == 'GRU' or name == 'LSTM':
             X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1], 1))
+        elif name == 'Xgboost':
+            X_test = xgb.DMatrix(X_test)
         file = 'images/' + name + '.png'
-        plot_model(model, to_file=file, show_shapes=True)
+        # plot_model(model, to_file=file, show_shapes=True)
         predicted = model.predict(X_test)
         predicted = scaler.inverse_transform(predicted.reshape(-1, 1)).reshape(1, -1)[0]
         y_preds.append(predicted[:384])
