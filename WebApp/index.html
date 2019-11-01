@@ -67,6 +67,7 @@
         <div class="multiselect select mb-2">
           <div class="multiselect__tags">
 
+            <!-- Input Controls -->
             <div class="row">
               <div class="col-2">
                 <input class="form-control" v-model.number="time_hour" type="number" id="inputHour" value="10" min="0"
@@ -111,18 +112,12 @@
           </div>
         </div>
 
-        <multiselect v-if="search_type == 'location'" class="select" v-model="search_origin" label="text"
-          placeholder="Origin" :options="to_options" @search-change="GeocodeFrom"></multiselect>
-
-        <multiselect v-else class="select" v-model="scat_origin" placeholder="Origin" :options="scat_sites"
-          @search-change="console.log('hello')"></multiselect>
+        <multiselect class="select" v-model="search_origin" label="text" placeholder="Origin" :options="to_options"
+          @search-change="GeocodeFrom"></multiselect>
 
         <transition name="fade">
           <multiselect v-if="search_origin" class="select top-space" v-model="search_destination" label="text"
             placeholder="Destination" :options="from_options" @search-change="GeocodeTo"></multiselect>
-
-          <multiselect v-if="scat_origin" class="select top-space" v-model="scat_destination" placeholder="Destination"
-            :options="scat_sites" @search-change="console.log('there')"></multiselect>
         </transition>
       </div>
 
@@ -130,13 +125,6 @@
         <div class="container options-box" style="right: 0;" v-if="search_destination || scat_destination">
           <div class="row">
             <h2 class="mb-2">Options</h2>
-            <!-- <span class="ml-auto">
-              Sort By:
-              <select class="custom-select my-1 mr-sm-2">
-                <option selected value="dist">Distance</option>
-                <option value="time">Estimated Time</option>
-              </select>
-            </span> -->
           </div>
 
           <div>
@@ -165,11 +153,11 @@
     </v-app>
   </div>
   <script>
+    // Custom marker for location set
     var userSetIcon = L.icon({
       iconUrl: './assets/red_marker.png',
       iconSize: [36, 41],
       iconAnchor: [18, 41],
-
       popupAnchor: [-3, -76]
     });
 
@@ -199,8 +187,6 @@
         route_drawn: false,
         selected_route_drawn: false,
 
-        search_type: 'location',
-
         entry_point: null,
         exit_point: null,
 
@@ -228,14 +214,6 @@
         }
       },
       watch: {
-        search_type: function () {
-          // When this is changed, reset all input vars
-          this.search_origin = '';
-          this.search_destination = '';
-          this.scat_origin = '';
-          this.scat_destination = '';
-          this.routes = [];
-        },
         search_origin: function () {
           var lat = this.search_origin.geometry.coordinates[1];
           var lng = this.search_origin.geometry.coordinates[0];
@@ -285,7 +263,7 @@
         }
       },
       methods: {
-        // UI Functions
+        // UI UX Functions
         HighlightRoute: function (event, id) {
           switch (event) {
             case 'hover':
@@ -336,10 +314,9 @@
 
           this.route_drawn = true;
           this.selected_route_drawn = true;
+
+          // Draw route via the passed in ID
           this.DrawRoute(this.routes[id], true);
-        },
-        UpdateSearchMethod: function (event) {
-          this.search_type = event.target.value;
         },
 
         // Routing Functions
@@ -355,6 +332,7 @@
           var num_steps = Math.floor(Math.random() * 6) + 1; // Generates a random int between 1 to 6
           var step_index = 0; // Current index
 
+          // Variale to hold the point for the next point
           var next_point_id = null;
 
           // First - Find the next point
@@ -362,6 +340,7 @@
             var num_neighbours = current_point.neighbours.length;
             var neighbour_selection = Math.floor(Math.random() * (num_neighbours));
 
+            // Keep randomising the next point until new traversal is found
             while (steps.includes(current_point.neighbours[neighbour_selection])) {
               neighbour_selection = Math.floor(Math.random() * (num_neighbours));
             }
@@ -385,7 +364,6 @@
           }
 
           return { steps: steps, distance: total_distance, volume: total_traffic_volume };
-          // return { steps: steps, distance: total_distance };
         },
         FindPathBetweenPoints: async function (start, exit) {
           var steps = start.steps;      // From generated seeded start'
@@ -423,6 +401,7 @@
             // Find the closest point to the exit
             var targetPoint = turf.point([exit.lat, exit.lng]);
 
+            // Create an array of Turf JS Point Objects from the neighbouring locations
             var _points = [];
             temp_point.neighbours.forEach(n_id => {
               var obj = _.find(groups, ['scat_id', n_id]);
@@ -438,7 +417,7 @@
 
             var next_point = _.find(groups, ['scat_id', temp_point.neighbours[nearest_index]])
 
-            // Increment distance & record step 
+            // Increment distance, traffic volume & record step 
             distance += this.CalculateDistance([next_point.lat, next_point.lng], [temp_point.lat, temp_point.lng]);
             traffic_volume += await this.GetTrafficVolume(temp_point.scat_id);
             steps.push(next_point.scat_id);
@@ -454,11 +433,12 @@
 
         // Accumulative Functions
         InitialiseMap: function () {
+          // Create the map object
           this.map = L.map('mapid', {
             zoomControl: false
           }).setView([-37.8131, 145.0678], 13);
 
-          // Initialise Map
+          // Initialise map tiles from MapBox Service
           L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
             attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
             maxZoom: 18,
@@ -489,9 +469,8 @@
           // Get the objects for the selected markers neighbours
           var neighbour_objs = [];
 
+          // Draw a line from the selected marker to the neighbour marker
           obj.neighbours.forEach(neighbour => {
-
-            // Draw a line from the selected marker to the neighbour marker
             var n_obj = _.find(groups, ['scat_id', neighbour]);
 
             this.DrawLine([
@@ -669,10 +648,6 @@
           return results;
         },
         GetTrafficVolume: async function (scat_id, day, time) {
-          // var traffic_data = [0.63777778, 0.46666667, 0.39333333, 0.48666667, 0.34666667, 0.29333333, 0.3, 0.30444444, 0.29111111, 0.26222222, 0.27555556, 0.28444444]
-          // var rain_data = [0,0,0,0,0,0,0,0,0,0,0,0];
-          // var day = [0,0,0,0,0,0,0,0,0,0,0,0];
-
           // Retrieve the scale factor, minimum and maximum scaler data for the location
           var csv_values = await axios.get('/scaler_data/' + scat_id + '.txt').then((response) => { return response.data.split(','); });
 
