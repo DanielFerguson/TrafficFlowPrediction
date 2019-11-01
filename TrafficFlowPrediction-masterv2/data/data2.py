@@ -10,7 +10,8 @@ from datetime import date, timedelta,datetime
 NUMERIC_DAY = 96 #4(15 min per hour) * 24(for 24 hours) 
 
 
-def get_weekend_data(sdate,edate):
+# for geeting weekend array for the dataset
+def get_weekend_data(sdate,edate): 
     sdate =  datetime.strptime(sdate,'%d/%m/%Y').date()
     edate =  datetime.strptime(edate,'%d/%m/%Y').date()
     time_period = edate - sdate
@@ -24,6 +25,7 @@ def get_weekend_data(sdate,edate):
     return weekend
 
 
+#getting rain data with correct dates
 def rain_data(rain_date,rain,dates):
     rain_dict = dict(zip(rain_date,rain))
     
@@ -49,24 +51,24 @@ def process_data(file, lags):
     """
     
 #     read csv file
-    df = pd.read_csv("../Data/data/{}".format(file), encoding='utf-8',header=None).fillna(0)
-    df2 = pd.read_csv("data/rain_weekend.csv", encoding='utf-8').fillna(0)
+    df = pd.read_csv("../Data/data/{}".format(file), encoding='utf-8',header=None).fillna(0) # read traffic data
+    df2 = pd.read_csv("data/rain_weekend.csv", encoding='utf-8').fillna(0) # read rainfall data
    
     
-    date = np.array(df.iloc[:,2])
-    weekend = get_weekend_data(date[0],date[-1])
+    date = np.array(df.iloc[:,2]) # reading dates from the csv
+    weekend = get_weekend_data(date[0],date[-1]) # preparing weekend data according do the dates in csv
     
-    rain_date = df2['date']
-    rainfall_data = df2['rain_mm']
-    rainfall_data = normalize(rainfall_data[:,np.newaxis], axis=0).ravel()
-    rainfall_data = rain_data(rain_date, rainfall_data,date)
+    rain_date = df2['date'] # reading rain date
+    rainfall_data = df2['rain_mm'] # reading rain mm
+    rainfall_data = normalize(rainfall_data[:,np.newaxis], axis=0).ravel() # normailing all the rain data
+    rainfall_data = rain_data(rain_date, rainfall_data,date) # preparing rain data according to the dates in traffic data csv
     
   
-    weekend = list([item]*NUMERIC_DAY for item in weekend)
+    weekend = list([item]*NUMERIC_DAY for item in weekend) #making values for one day per 15 mins
     weekend = np.array(weekend)  
     weekend = weekend.ravel()
   
-    rainfall_data = list([item]*NUMERIC_DAY for item in rainfall_data)
+    rainfall_data = list([item]*NUMERIC_DAY for item in rainfall_data) #making values for one day per 15 mins
     rainfall_data = np.array(rainfall_data)  
     rainfall_data = rainfall_data.ravel()
 
@@ -96,9 +98,9 @@ def process_data(file, lags):
     
     
     train, test = [], []
-    for i in range(lags, flow1.shape[1]):
+    for i in range(lags, flow1.shape[1]): # creating flow with the number of lags provided for training
         train.append(flow1[:,i - lags: i + 1])
-    for i in range(lags, flow2.shape[1]):
+    for i in range(lags, flow2.shape[1]): # creating test set
         test.append(flow2[:,i - lags: i + 1])
 
     train = np.array(train)

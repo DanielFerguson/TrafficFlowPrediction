@@ -102,12 +102,13 @@ def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--lag", default="12", help="lags")
-    parser.add_argument("--model", default="970_1_data.csv", help="lags")   
+    parser.add_argument("--model", default="970_1_data.csv", help="csv file name for the model")   
     args = parser.parse_args()
     lag = int(args.lag)
     model_name = args.model
-    model_name = os.path.splitext(model_name)[0]
+    model_name = os.path.splitext(model_name)[0] # getting model name
 
+    # load all the models
     lstm = load_model('model/lstm.h5')
     gru = load_model('model/gru.h5')
     saes = load_model('model/saes.h5')
@@ -126,17 +127,18 @@ def main():
 
     y_preds = []
     for name, model in zip(names, models):
+         _, _, X_test, _,_ = process_data(file, lag)
         if name == 'SAEs':
             X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1]))
         elif name == 'GRU' or name == 'LSTM':
             X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1], 1))
         elif name == 'Xgboost':
             X_test = xgb.DMatrix(X_test)
-        file = 'images/' + name + '.png'
+        # file = 'images/' + name + '.png'
         # plot_model(model, to_file=file, show_shapes=True)
         predicted = model.predict(X_test)
         predicted = scaler.inverse_transform(predicted.reshape(-1, 1)).reshape(1, -1)[0]
-        y_preds.append(predicted[:384])
+        y_preds.append(predicted[:384]) # append all the prediction results
         print(name)
         eva_regress(y_test, predicted)
 
