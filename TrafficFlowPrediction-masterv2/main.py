@@ -142,7 +142,7 @@ def main():
         print(name)
         eva_regress(y_test, predicted)
 
-    # plot_results(y_test[:384], y_preds, names)
+    plot_results(y_test[:384], y_preds, names)
 
 
 if __name__ == '__main__':

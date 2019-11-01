@@ -72,8 +72,8 @@ def plot_results(y_true, y_preds, names):
         y_pred: List/ndarray, predicted data.
         names: List, Method names.
     """
-    d = '2006-10-25 19:00'
-    x = pd.date_range(d, periods=384, freq='15min')
+    d = '2006-10-25 19:00' #use date from 25 october to include weekend data
+    x = pd.date_range(d, periods=384, freq='15min') #use period as 384 to show 4 day data 96 * 4
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
@@ -98,14 +98,14 @@ def main():
 
     lstm = []
     y_preds = []
-    for idx in range(4,13):
+    for idx in range(4,13): #training logs from value 4 to 12
         lstm.append("lstm_{}.h5".format(idx))
         model = load_model('model/{}'.format(lstm[idx-4]))
 
         file = '970_1_data.csv'
         _, _, X_test, y_test, scaler = process_data(file, idx)
         y_test = scaler.inverse_transform(y_test.reshape(-1, 1)).reshape(1, -1)[0]
-        
+
         X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1], 1))
         predicted = model.predict(X_test)
         predicted = scaler.inverse_transform(predicted.reshape(-1, 1)).reshape(1, -1)[0]
