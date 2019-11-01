@@ -34,9 +34,9 @@ def train_model(model, X_train, y_train, name, config):
         epochs=config["epochs"],
         validation_split=0.05)
 
-    model.save('model/' + name + '.h5')
+    model.save('model/' + name + '.h5') # saving the model
     df = pd.DataFrame.from_dict(hist.history)
-    df.to_csv('model/' + name + ' loss.csv', encoding='utf-8', index=False)
+    df.to_csv('model/' + name + ' loss.csv', encoding='utf-8', index=False) # storing loss values
 
 
 def train_seas(models, X_train, y_train, name, config):
@@ -87,24 +87,17 @@ def main(argv):
     args = parser.parse_args()
 
     lag = int(args.lag)
-    config = {"batch": 256, "epochs": 600}
+    config = {"batch": 256, "epochs": 600} # training config
     file = args.file_name
     model_name = os.path.splitext(file)[0]
     X_train, y_train, _, _, _ = process_data(file, lag)
 
     if args.model == 'lstm':
-        # X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], X_train.shape[2],1))
-        m = model.get_lstm([[3, lag], 64, 64, 1])
+        m = model.get_lstm([[3, lag], 64, 64, 1]) # changing the input to 3, lags for rain data model
         train_model(m, X_train, y_train, "{}_lstm".format(model_name), config)
     if args.model == 'gru':
-        # X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], X_train.shape[2],1))
         m = model.get_gru([[3, lag], 64, 64, 1])
-        train_model(m, X_train, y_train, "{}_gru".format(model_name), config)
-    if args.model == 'saes':
-        X_train = np.reshape(
-            X_train, (X_train.shape[0], X_train.shape[1], X_train.shape[2]))
-        m = model.get_saes([[3, lag], 400, 400, 400, 1])
-        train_seas(m, X_train, y_train, "{}_saes".format(model_name), config)
+        train_model(m, X_train, y_train, "{}_gru".format(model_name), config) # changing the input to 3, lags for rain data model
 
 
 if __name__ == '__main__':

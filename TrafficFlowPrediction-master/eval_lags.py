@@ -104,12 +104,12 @@ def main():
 
         file = '970_1_data.csv'
         _, _, X_test, y_test, scaler = process_data(file, idx)
-        y_test = scaler.inverse_transform(y_test.reshape(-1, 1)).reshape(1, -1)[0]
+        y_test = scaler.inverse_transform(y_test.reshape(-1, 1)).reshape(1, -1)[0] #scaling the model from 0,1 to orignal value
 
         X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1], 1))
-        predicted = model.predict(X_test)
-        predicted = scaler.inverse_transform(predicted.reshape(-1, 1)).reshape(1, -1)[0]
-        y_preds.append(predicted[:384])
+        predicted = model.predict(X_test) 
+        predicted = scaler.inverse_transform(predicted.reshape(-1, 1)).reshape(1, -1)[0] 
+        y_preds.append(predicted[:384]) # adding all the lags model prediction to y_preds
         print(lstm[idx-4])
         eva_regress(y_test, predicted)
 

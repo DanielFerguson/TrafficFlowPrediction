@@ -21,16 +21,16 @@ def process_data(file, lags):
     """
     
 #     read csv file
-    df = pd.read_csv("/Users/ditlswin/Documents/rkaul/traffic_flow_predi/TrafficFlowPrediction-master/data/{}".format(file), encoding='utf-8',header=None).fillna(0)
+    df = pd.read_csv("data/{}".format(file), encoding='utf-8',header=None).fillna(0) # read data from csv
 
 #   read all the vehicle/15min in one array   
-    flow = np.array(df.iloc[:,3:])
-    flow = flow.ravel()
+    flow = np.array(df.iloc[:,3:]) # read all after third column which is traffic flow for a particular location
+    flow = flow.ravel() # converting it to a 1D array
 
     
 #     normalize all the values  
-    scaler = MinMaxScaler(feature_range=(0, 1)).fit(flow.reshape(-1, 1))
-    normalized_flow = scaler.transform(flow.reshape(-1, 1)).reshape(1, -1)[0]
+    scaler = MinMaxScaler(feature_range=(0, 1)).fit(flow.reshape(-1, 1)) # seting scaler data between 0 - 1 
+    normalized_flow = scaler.transform(flow.reshape(-1, 1)).reshape(1, -1)[0] # scaling data between 0 - 1 
     
 
 #     splitting the file into train and test dataset
@@ -42,9 +42,9 @@ def process_data(file, lags):
     
     
     train, test = [], []
-    for i in range(lags, len(flow1)):
+    for i in range(lags, len(flow1)): # creating flow with the number of lags provided for training
         train.append(flow1[i - lags: i + 1])
-    for i in range(lags, len(flow2)):
+    for i in range(lags, len(flow2)): # creating test set
         test.append(flow2[i - lags: i + 1])
 
     train = np.array(train)
