@@ -2,96 +2,89 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Traffic Flow</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Traffic Flow</title>
 
-  <!-- Lodash -->
-  <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.15/lodash.min.js"
-    integrity="sha256-VeNaFBVDhoX3H+gJ37DpT/nTuZTdjYro9yBruHjVmoQ=" crossorigin="anonymous"></script>
+    <!-- Lodash -->
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.15/lodash.min.js" integrity="sha256-VeNaFBVDhoX3H+gJ37DpT/nTuZTdjYro9yBruHjVmoQ=" crossorigin="anonymous"></script>
 
-  <!-- Axios -->
-  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <!-- Axios -->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
-  <!-- MapBox -->
-  <script src='https://api.mapbox.com/mapbox-gl-js/v1.2.0/mapbox-gl.js'></script>
-  <link href='https://api.mapbox.com/mapbox-gl-js/v1.2.0/mapbox-gl.css' rel='stylesheet' />
+    <!-- MapBox -->
+    <script src='https://api.mapbox.com/mapbox-gl-js/v1.2.0/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v1.2.0/mapbox-gl.css' rel='stylesheet' />
 
-  <!-- Leaflet -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"
-    integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
-    crossorigin="" />
-  <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"
-    integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
-    crossorigin=""></script>
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css" integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js" integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og==" crossorigin=""></script>
 
-  <!-- FontAwesome -->
-  <link href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" rel="stylesheet">
 
-  <!-- UTF-8 Library -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/utf8/3.0.0/utf8.min.js"></script>
+    <!-- UTF-8 Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/utf8/3.0.0/utf8.min.js"></script>
 
-  <!-- VueJS -->
-  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <!-- VueJS -->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 
-  <!-- Vuetify -->
-  <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/@mdi/font@3.x/css/materialdesignicons.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+    <!-- Vuetify -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@3.x/css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
 
-  <!-- Vue Multiselect -->
-  <script src="https://unpkg.com/vue-multiselect@2.1.0"></script>
-  <link rel="stylesheet" href="https://unpkg.com/vue-multiselect@2.1.0/dist/vue-multiselect.min.css">
+    <!-- Vue Multiselect -->
+    <script src="https://unpkg.com/vue-multiselect@2.1.0"></script>
+    <link rel="stylesheet" href="https://unpkg.com/vue-multiselect@2.1.0/dist/vue-multiselect.min.css">
 
-  <!-- Turfjs -->
-  <script src='https://npmcdn.com/@turf/turf/turf.min.js'></script>
+    <!-- Turfjs -->
+    <script src='https://npmcdn.com/@turf/turf/turf.min.js'></script>
 
-  <!-- Tensorflow -->
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.0/dist/tf.min.js"></script>
+    <!-- Tensorflow -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.0/dist/tf.min.js"></script>
 
-  <!-- SCAT Locations Data -->
-  <script src="./groups.js"></script>
+    <!-- SCAT Locations Data -->
+    <script src="./groups.js"></script>
 
-  <!-- Stylesheet -->
-  <link rel="stylesheet" href="style.css">
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-  <div id="app">
-    <v-app>
-      <div class="map" id="mapid"></div>
+    <div id="app">
+        <v-app>
+            <div class="map" id="mapid"></div>
 
-      <div class="search-box">
-        <div class="multiselect select mb-2">
-          <div class="multiselect__tags">
+            <div class="search-box">
+                <div class="multiselect select mb-2">
+                    <div class="multiselect__tags">
 
-            <!-- Input Controls -->
-            <div class="row">
-              <div class="col-2">
-                <input class="form-control" v-model.number="time_hour" type="number" id="inputHour" value="10" min="0"
-                  max="23">
-              </div>
+                        <!-- Input Controls -->
+                        <div class="row">
+                            <div class="col-2">
+                                <input class="form-control" v-model.number="time_hour" type="number" id="inputHour" value="10" min="0" max="23">
+                            </div>
 
-              <div class="col-2">
-                <input class="form-control" v-model.number="time_min" type="number" id="inputHour" value="30" min="0"
-                  max="59">
-              </div>
+                            <div class="col-2">
+                                <input class="form-control" v-model.number="time_min" type="number" id="inputHour" value="30" min="0" max="59">
+                            </div>
 
-              <div class="col-4 offset-1">
-                Rainfall
-                <select v-model.number="selected_rainfall" class="custom-select mr-sm-2">
+                            <div class="col-4 offset-1">
+                                Rainfall
+                                <select v-model.number="selected_rainfall" class="custom-select mr-sm-2">
                   <option value="0">0</option>
                   <option value="2">2mm</option>
                   <option value="5">5mm</option>
                   <option value="10">10mm</option>
                   <option value="20">20mm</option>
                 </select>
-              </div>
+                            </div>
 
-              <div class="col-3 text-center">
-                <select v-model="selected_day" class="custom-select mr-sm-2">
+                            <div class="col-3 text-center">
+                                <select v-model="selected_day" class="custom-select mr-sm-2">
                   <option value="monday">Monday</option>
                   <option value="tuesday">Tuesday</option>
                   <option value="wednesday">Wednesday</option>
@@ -100,593 +93,600 @@
                   <option value="saturday">Saturday</option>
                   <option value="sunday">Sunday</option>
                 </select>
-              </div>
+                            </div>
 
-              <!-- <div class="col-3 text-center">
+                            <!-- <div class="col-3 text-center">
                 <select class="custom-select mr-sm-2" @change="UpdateSearchMethod($event)">
                   <option selected value="location">Location</option>
                   <option value="scat">SCAT Site</option>
                 </select>
               </div> -->
-            </div>
-          </div>
-        </div>
-
-        <multiselect class="select" v-model="search_origin" label="text" placeholder="Origin" :options="to_options"
-          @search-change="GeocodeFrom"></multiselect>
-
-        <transition name="fade">
-          <multiselect v-if="search_origin" class="select top-space" v-model="search_destination" label="text"
-            placeholder="Destination" :options="from_options" @search-change="GeocodeTo"></multiselect>
-        </transition>
-      </div>
-
-      <transition name="slide">
-        <div class="container options-box" style="right: 0;" v-if="search_destination || scat_destination">
-          <div class="row">
-            <h2 class="mb-2">Options</h2>
-          </div>
-
-          <div>
-            <div class="card option-card mb-3" v-for="(route, index) in routes" :key="index">
-              <div class="card-body option-card-body" @click="SelectRoute(index)"
-                @mouseover="HighlightRoute('hover', index)" @mouseleave="HighlightRoute('leave')">
-                <div class="row">
-                  <div class="col-6">
-                    <h3 class="card-title">Route #{{ index + 1 }}</h3>
-                  </div>
-                  <div class="col-2 my-auto">
-                    <h6 class="card-subtitle text-muted">{{ route.distance.toFixed(2) }}kms</h6>
-                  </div>
-                  <div class="col-2 my-auto">
-                    <h6 class="card-subtitle text-muted">{{ route.steps.length }} steps</h6>
-                  </div>
-                  <div class="col-2 my-auto">
-                    <h6 class="card-subtitle text-muted">{{ (route.volume / 52).toFixed(0) }} minutes</h6>
-                  </div>
+                        </div>
+                    </div>
                 </div>
-              </div>
+
+                <multiselect class="select" v-model="search_origin" label="text" placeholder="Origin" :options="to_options" @search-change="GeocodeFrom"></multiselect>
+
+                <transition name="fade">
+                    <multiselect v-if="search_origin" class="select top-space" v-model="search_destination" label="text" placeholder="Destination" :options="from_options" @search-change="GeocodeTo"></multiselect>
+                </transition>
             </div>
-          </div>
-        </div>
-      </transition>
-    </v-app>
-  </div>
-  <script>
-    // Custom marker for location set
-    var userSetIcon = L.icon({
-      iconUrl: './assets/red_marker.png',
-      iconSize: [36, 41],
-      iconAnchor: [18, 41],
-      popupAnchor: [-3, -76]
-    });
 
-    var paths = [];
-    var selected_route_path = [];
-    var temp_paths = [];
+            <transition name="slide">
+                <div class="container options-box" style="right: 0;" v-if="search_destination || scat_destination">
+                    <div class="row">
+                        <h2 class="mb-2">Options</h2>
+                    </div>
 
-    var options = [];
+                    <div>
+                        <div class="card option-card mb-3" v-for="(route, index) in routes" :key="index">
+                            <div class="card-body option-card-body" @click="SelectRoute(index)" @mouseover="HighlightRoute('hover', index)" @mouseleave="HighlightRoute('leave')">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <h3 class="card-title">Route #{{ index + 1 }}</h3>
+                                    </div>
+                                    <div class="col-2 my-auto">
+                                        <h6 class="card-subtitle text-muted">{{ route.distance.toFixed(2) }}kms</h6>
+                                    </div>
+                                    <div class="col-2 my-auto">
+                                        <h6 class="card-subtitle text-muted">{{ route.steps.length }} steps</h6>
+                                    </div>
+                                    <div class="col-2 my-auto">
+                                        <h6 class="card-subtitle text-muted">{{ (route.volume / 52).toFixed(0) }} minutes</h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </transition>
+        </v-app>
+    </div>
+    <script>
+        // Custom marker for location set
+        var userSetIcon = L.icon({
+            iconUrl: './assets/red_marker.png',
+            iconSize: [36, 41],
+            iconAnchor: [18, 41],
+            popupAnchor: [-3, -76]
+        });
 
-    Vue.component('multiselect', window.VueMultiselect.default);
+        var paths = [];
+        var selected_route_path = [];
+        var temp_paths = [];
 
-    var app = new Vue({
-      el: '#app',
-      vuetify: new Vuetify(),
-      icons: {
-        iconfont: 'fa',
-      },
-      mounted: function () {
-        this.InitialiseMap();
-      },
-      data: {
-        to_options: [],
-        from_options: [],
+        var options = [];
 
-        map: null,
+        Vue.component('multiselect', window.VueMultiselect.default);
 
-        route_drawn: false,
-        selected_route_drawn: false,
+        var app = new Vue({
+            el: '#app',
+            vuetify: new Vuetify(),
+            icons: {
+                iconfont: 'fa',
+            },
+            mounted: function() {
+                this.InitialiseMap();
+            },
+            data: {
+                to_options: [],
+                from_options: [],
 
-        entry_point: null,
-        exit_point: null,
+                map: null,
 
-        selected_day: "monday",
-        selected_rainfall: 0,
-        time_hour: 10,
-        time_min: 30,
+                route_drawn: false,
+                selected_route_drawn: false,
 
-        routes: [],
+                entry_point: null,
+                exit_point: null,
 
-        final_distance: null,
+                selected_day: "monday",
+                selected_rainfall: 0,
+                time_hour: 10,
+                time_min: 30,
 
-        search_origin: '',
-        search_destination: '',
-        scat_origin: '',
-        scat_destination: ''
-      },
-      computed: {
-        scat_sites: function () {
-          var list = [];
-          groups.forEach(site => {
-            list.push(site.scat_id)
-          });
-          return list;
-        }
-      },
-      watch: {
-        search_origin: function () {
-          var lat = this.search_origin.geometry.coordinates[1];
-          var lng = this.search_origin.geometry.coordinates[0];
+                routes: [],
 
-          // Add Point Marker to map
-          L.marker([lat, lng], {
-            icon: userSetIcon
-          }).addTo(this.map);
+                final_distance: null,
 
-          // Link to the closest Marker
-          var result = this.FindNearestPoint(lat, lng);
-          this.entry_point = result.nearest;
+                search_origin: '',
+                search_destination: '',
+                scat_origin: '',
+                scat_destination: ''
+            },
+            computed: {
+                scat_sites: function() {
+                    var list = [];
+                    groups.forEach(site => {
+                        list.push(site.scat_id)
+                    });
+                    return list;
+                }
+            },
+            watch: {
+                search_origin: function() {
+                    var lat = this.search_origin.geometry.coordinates[1];
+                    var lng = this.search_origin.geometry.coordinates[0];
 
-          // Draw line between points
-          this.DrawLine([
-            [lat, lng],
-            [result.nearest.lat, result.nearest.lng]
-          ], 'blue', 'static', '0.4');
-        },
-        search_destination: async function () {
-          var lat = this.search_destination.geometry.coordinates[1];
-          var lng = this.search_destination.geometry.coordinates[0];
+                    // Add Point Marker to map
+                    L.marker([lat, lng], {
+                        icon: userSetIcon
+                    }).addTo(this.map);
 
-          // Add Point Marker to map
-          L.marker([lat, lng], {
-            icon: userSetIcon
-          }).addTo(this.map);
+                    // Link to the closest Marker
+                    var result = this.FindNearestPoint(lat, lng);
+                    this.entry_point = result.nearest;
 
-          // Link to the closest Marker
-          var result = this.FindNearestPoint(lat, lng);
-          this.exit_point = result.nearest;
+                    // Draw line between points
+                    this.DrawLine([
+                        [lat, lng],
+                        [result.nearest.lat, result.nearest.lng]
+                    ], 'blue', 'static', '0.4');
+                },
+                search_destination: async function() {
+                    var lat = this.search_destination.geometry.coordinates[1];
+                    var lng = this.search_destination.geometry.coordinates[0];
 
-          // Draw line between points
-          this.DrawLine([
-            [lat, lng],
-            [result.nearest.lat, result.nearest.lng]
-          ], 'blue', 'static', '0.4');
+                    // Add Point Marker to map
+                    L.marker([lat, lng], {
+                        icon: userSetIcon
+                    }).addTo(this.map);
 
-          // Generate Routes
-          for (let i = 0; i < 5; i++) {
-            var generated_seed = await this.GenerateSeededStart();
+                    // Link to the closest Marker
+                    var result = this.FindNearestPoint(lat, lng);
+                    this.exit_point = result.nearest;
 
-            await this.FindPathBetweenPoints(generated_seed, this.exit_point).then((res) => {
-              this.routes.push(res);
-            });
-          }
-        }
-      },
-      methods: {
-        // UI UX Functions
-        HighlightRoute: function (event, id) {
-          switch (event) {
-            case 'hover':
-              if (!this.route_drawn) {
-                this.DrawRoute(this.routes[id]);
-                this.route_drawn = true;
-              }
-              break;
+                    // Draw line between points
+                    this.DrawLine([
+                        [lat, lng],
+                        [result.nearest.lat, result.nearest.lng]
+                    ], 'blue', 'static', '0.4');
 
-            case 'leave':
-              this.RemoveLines();
-              this.route_drawn = false;
-              break;
+                    // Generate Routes
+                    for (let i = 0; i < 5; i++) {
+                        var generated_seed = await this.GenerateSeededStart();
 
-            default:
-              console.log('error');
-              break;
-          }
-        },
-        DrawRoute: function (route, selected) {
-          var steps = route.steps;
+                        await this.FindPathBetweenPoints(generated_seed, this.exit_point).then((res) => {
+                            this.routes.push(res);
+                        });
+                    }
+                }
+            },
+            methods: {
+                // UI UX Functions
+                HighlightRoute: function(event, id) {
+                    switch (event) {
+                        case 'hover':
+                            if (!this.route_drawn) {
+                                this.DrawRoute(this.routes[id]);
+                                this.route_drawn = true;
+                            }
+                            break;
 
-          var _selected = selected ? 'selected' : 'highlight';
-          var _opacity = selected ? '1.0' : '0.4';
-          var current_step = _.find(groups, ['scat_id', steps[0]]);
+                        case 'leave':
+                            this.RemoveLines();
+                            this.route_drawn = false;
+                            break;
 
-          steps.forEach(step => {
-            // Skip over the first & last steps
-            if (step != current_step) {
-              // Draw a line between the current_point and the step object
-              var obj = _.find(groups, ['scat_id', step]);
+                        default:
+                            console.log('error');
+                            break;
+                    }
+                },
+                DrawRoute: function(route, selected) {
+                    var steps = route.steps;
 
-              this.DrawLine([
-                [current_step.lat, current_step.lng],
-                [obj.lat, obj.lng]
-              ],
-                'blue',
-                _selected,
-                _opacity
-              );
-              current_step = obj;
+                    var _selected = selected ? 'selected' : 'highlight';
+                    var _opacity = selected ? '1.0' : '0.4';
+                    var current_step = _.find(groups, ['scat_id', steps[0]]);
+
+                    steps.forEach(step => {
+                        // Skip over the first & last steps
+                        if (step != current_step) {
+                            // Draw a line between the current_point and the step object
+                            var obj = _.find(groups, ['scat_id', step]);
+
+                            this.DrawLine([
+                                    [current_step.lat, current_step.lng],
+                                    [obj.lat, obj.lng]
+                                ],
+                                'blue',
+                                _selected,
+                                _opacity
+                            );
+                            current_step = obj;
+                        }
+                    });
+                },
+                SelectRoute: function(id) {
+                    // Clear the previously drawn selected route
+                    this.RemoveSelectedRoute();
+
+                    this.route_drawn = true;
+                    this.selected_route_drawn = true;
+
+                    // Draw route via the passed in ID
+                    this.DrawRoute(this.routes[id], true);
+                },
+
+                // Routing Functions
+                GenerateSeededStart: async function() {
+                    var starting_point = this.entry_point;
+                    var current_point = starting_point;
+
+                    var steps = [starting_point.scat_id]; // A list of all nodes travelled to/from, initalized with entry point
+                    var total_distance = 0; // Total distance travelled
+                    var total_traffic_volume = 0; // Total traffic volume
+
+                    // Generate Seeded Starting Point
+                    var num_steps = Math.floor(Math.random() * 6) + 1; // Generates a random int between 1 to 6
+                    var step_index = 0; // Current index
+
+                    // Variale to hold the point for the next point
+                    var next_point_id = null;
+
+                    // First - Find the next point
+                    for (let i = 0; i < num_steps; i++) {
+                        var num_neighbours = current_point.neighbours.length;
+                        var neighbour_selection = Math.floor(Math.random() * (num_neighbours));
+
+                        // Keep randomising the next point until new traversal is found
+                        while (steps.includes(current_point.neighbours[neighbour_selection])) {
+                            neighbour_selection = Math.floor(Math.random() * (num_neighbours));
+                        }
+
+                        next_point_id = current_point.neighbours[neighbour_selection];
+
+                        // Get the object for the scat_id
+                        var next_point_obj = _.find(groups, ['scat_id', next_point_id]);
+
+                        // Find the distance between current_point --> next_point, record it in total_distance
+                        total_distance += this.CalculateDistance([next_point_obj.lat, next_point_obj.lng], [current_point.lat, current_point.lng]);
+
+                        // Find the traffic volume between points
+                        total_traffic_volume += await this.GetTrafficVolume(current_point.scat_id);
+
+                        // Push the record of the traversal onto steps
+                        steps.push(next_point_id);
+
+                        // Set the current_point to the found object of the next_point in groups
+                        current_point = next_point_obj;
+                    }
+
+                    return {
+                        steps: steps,
+                        distance: total_distance,
+                        volume: total_traffic_volume
+                    };
+                },
+                FindPathBetweenPoints: async function(start, exit) {
+                    var steps = start.steps; // From generated seeded start'
+                    var distance = start.distance // Already traversed distance
+                    var traffic_volume = start.volume // Already observed traffic volume
+
+                    var start_point = _.find(groups, ['scat_id', start.steps[-1]]); // Find the latest point
+
+                    var current_point = null;
+                    var index = 0;
+
+                    steps.forEach(step => {
+                        // Check that this point is not the last point in the steps array, to stop overflows
+                        if (step != steps[steps.length - 1]) {
+                            // Find the current point, if null
+                            if (current_point == null) {
+                                current_point = _.find(groups, ['scat_id', step]);
+                            }
+
+                            // Find the point after this one
+                            var next_point = _.find(groups, ['scat_id', steps[index + 1]]);
+
+                            // Update the current_point with the next_point, along with index
+                            current_point = next_point;
+                            index++;
+                        }
+                    });
+
+                    // Create path to exit_point using 'As the Crow Flies' method
+                    var control_index = 0;
+                    var temp_steps = [];
+
+                    var temp_point = current_point;
+                    while (control_index <= 25 && temp_point.scat_id != exit.scat_id) {
+                        // Find the closest point to the exit
+                        var targetPoint = turf.point([exit.lat, exit.lng]);
+
+                        // Create an array of Turf JS Point Objects from the neighbouring locations
+                        var _points = [];
+                        temp_point.neighbours.forEach(n_id => {
+                            var obj = _.find(groups, ['scat_id', n_id]);
+
+                            _points.push(
+                                turf.point([obj.lat, obj.lng])
+                            );
+                        });
+
+                        var points = turf.featureCollection(_points);
+                        var nearest = turf.nearestPoint(targetPoint, points);
+                        var nearest_index = nearest.properties.featureIndex;
+
+                        var next_point = _.find(groups, ['scat_id', temp_point.neighbours[nearest_index]])
+
+                        // Increment distance, traffic volume & record step 
+                        distance += this.CalculateDistance([next_point.lat, next_point.lng], [temp_point.lat, temp_point.lng]);
+                        traffic_volume += await this.GetTrafficVolume(temp_point.scat_id);
+                        steps.push(next_point.scat_id);
+
+                        temp_point = next_point;
+
+                        // Increment the control index to ensure no freezing
+                        control_index++;
+                    }
+
+                    return {
+                        steps: steps,
+                        distance: distance,
+                        volume: traffic_volume
+                    };
+                },
+
+                // Accumulative Functions
+                InitialiseMap: function() {
+                    // Create the map object
+                    this.map = L.map('mapid', {
+                        zoomControl: false
+                    }).setView([-37.8131, 145.0678], 13);
+
+                    // Initialise map tiles from MapBox Service
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    }).addTo(this.map);
+
+                    // Create Markers
+                    groups.forEach(location => {
+                        var lat = location['lat'];
+                        var lng = location['lng'];
+                        var id = location['scat_id'];
+
+                        L.marker([lat, lng]).bindPopup("<b>Scat ID: " + id + "</b>").on('click', this.DrawNeighbourConnections).addTo(this.map);
+                    });
+                },
+                DrawNeighbourConnections: function(marker) {
+                    // Remove all current connections
+                    this.RemoveLines();
+                    temp_paths = [];
+
+                    // Get the object of the selected marker
+                    var obj = _.find(groups, {
+                        'lat': marker.latlng.lat.toString(),
+                        'lng': marker.latlng.lng.toString()
+                    });
+
+                    // Get the objects for the selected markers neighbours
+                    var neighbour_objs = [];
+
+                    // Draw a line from the selected marker to the neighbour marker
+                    obj.neighbours.forEach(neighbour => {
+                        var n_obj = _.find(groups, ['scat_id', neighbour]);
+
+                        this.DrawLine([
+                            [obj.lat, obj.lng],
+                            [n_obj.lat, n_obj.lng]
+                        ], 'blue', 'highlight', '0.2');
+                    });
+                },
+
+                // Mapping & Drawing Functions
+                FindNearestPoint: function(lat, lng) {
+                    var points = [];
+
+                    // Create array of Turn Points
+                    groups.forEach(point => {
+                        points.push(
+                            turf.point([parseFloat(point.lat), parseFloat(point.lng)])
+                        );
+                    });
+
+                    var origin_point = turf.point([lat, lng]);
+
+                    // Find nearest Point
+                    var nearest_pos = turf.nearestPoint(origin_point, turf.featureCollection(points));
+
+                    // Get the Object for the nearest Point & distance to
+                    var nearest_obj = groups[nearest_pos.properties.featureIndex];
+                    var distance_to = nearest_pos.properties.distanceToPoint;
+
+                    return {
+                        'nearest': nearest_obj,
+                        'distance': distance_to
+                    };
+                },
+                CalculateDistance: function(pointOne, pointTwo) {
+                    var from = turf.point([pointOne[0], pointOne[1]]);
+                    var to = turf.point([pointTwo[0], pointTwo[1]]);
+                    var options = {
+                        units: 'kilometers'
+                    };
+
+                    return turf.distance(from, to, options);
+                },
+                DrawLine: function(latlngs, colour, type, opacity) {
+                    var pointOne = [parseFloat(latlngs[0][0]), parseFloat(latlngs[0][1])];
+                    var pointTwo = [parseFloat(latlngs[1][0]), parseFloat(latlngs[1][1])];
+
+                    if (opacity) {
+                        var l = L.polyline([latlngs], {
+                            color: colour,
+                            opacity: opacity,
+                        }).bindPopup("Distance: <b>" + this.CalculateDistance(pointOne, pointTwo).toFixed(2) + "kms</b>").addTo(this.map);
+                    } else {
+                        var l = L.polyline([latlngs], {
+                            color: colour
+                        }).bindPopup("Distance: <b>" + this.CalculateDistance(pointOne, pointTwo).toFixed(2) + "kms</b>").addTo(this.map);
+                    }
+
+                    // If temp (starting/ending lines) verticies, add to the temp directory 
+                    switch (type) {
+                        case 'highlight':
+                            temp_paths.push(l)
+                            break;
+
+                        case 'static':
+                            paths.push(l)
+                            break;
+
+                        case 'selected':
+                            selected_route_path.push(l)
+                            break;
+                    }
+                },
+                RemoveLines: function() {
+                    temp_paths.forEach(path => {
+                        this.map.removeLayer(path);
+                    });
+                },
+                RemoveSelectedRoute: function() {
+                    selected_route_path.forEach(path => {
+                        this.map.removeLayer(path);
+                    });
+                },
+
+                // Geocoding Functions
+                GenerateURL: function(query) {
+                    return "https://api.mapbox.com/geocoding/v5/mapbox.places/" + encodeURI(query) + ".json?access_token=sk.eyJ1IjoiZGFuaWVsZmVyZ3Vzb24iLCJhIjoiY2t1cnljNm13M2U3djJub2YxNDkxNmI0aCJ9.xF9m_ag8yzAvaDvMa5FhAg&country=au";
+                },
+                GeocodeFrom: function(searchQuery, id) {
+                    if (searchQuery) {
+                        axios
+                            .get(this.GenerateURL(searchQuery))
+                            .then((response) => {
+                                this.to_options = response.data.features
+                            })
+                            .catch((error) => (console.log(error)))
+                    }
+                },
+                GeocodeTo: function(searchQuery, id) {
+                    if (searchQuery) {
+                        axios
+                            .get(this.GenerateURL(searchQuery))
+                            .then((response) => {
+                                this.from_options = response.data.features
+                            })
+                            .catch((error) => (console.log(error)))
+                    }
+                },
+
+                // General Functions
+                ConvertDayToIndex: function() {
+                    // Convert the selected day into an index
+                    switch (this.selected_day) {
+                        case "monday":
+                            return 0;
+                            break;
+
+                        case "tuesday":
+                            return 1;
+                            break;
+
+                        case "wednesday":
+                            return 2;
+                            break;
+
+                        case "thursday":
+                            return 3;
+                            break;
+
+                        case "friday":
+                            return 4;
+                            break;
+
+                        case "saturday":
+                            return 5;
+                            break;
+
+                        case "sunday":
+                            return 5;
+                            break;
+                    }
+                },
+                ConvertTimeToNummber: function() {
+                    // Convert the selected time into an amount of 15 minute integers
+                    return ((this.time_hour * 4) + Math.round(this.time_min / 15));
+                },
+                CreateRainArray: function() {
+                    var _list = [];
+
+                    for (let i = 0; i < 12; i++) {
+                        _list.push(this.selected_rainfall / 20);
+                    }
+
+                    return _list;
+                },
+
+                // Machine Learning Functions
+                GetModel: async function(scat_id, day, time) {
+                    return await tf.loadLayersModel('models/' + scat_id + '/model.json');
+                },
+                GetTrafficData: async function(scat_id, day, time) {
+                    // Retrieve traffic data from file
+                    var results = await axios.get('traffic_data/' + scat_id + '.csv').then((response) => {
+                        return response.data.split(',');
+                    });
+
+                    // Chunk results into 95 values to represent each day
+                    results = _.chunk(results, 95)
+
+                    // Get the 12 previous records to predict on
+                    var day_index = this.ConvertDayToIndex();
+                    var time_num = this.ConvertTimeToNummber();
+
+                    // Slice the array for the day and 
+                    results = _.slice(results[day_index], time_num - 12, time_num);
+
+                    return results;
+                },
+                GetTrafficVolume: async function(scat_id, day, time) {
+                    // Retrieve the scale factor, minimum and maximum scaler data for the location
+                    var csv_values = await axios.get('/scaler_data/' + scat_id + '.txt').then((response) => {
+                        return response.data.split(',');
+                    });
+
+                    var scale = parseFloat(csv_values[0]);
+                    var minimum = parseFloat(csv_values[1]);
+                    var maximum = parseFloat(csv_values[2]);
+
+                    // Retrieve the previous 12 records of traffic data - non scaled
+                    var raw_traffic = await this.GetTrafficData(scat_id, day, time);
+                    var traffic = [];
+
+                    // Convert each of the raw_traffic records to scaled values
+                    raw_traffic.forEach(record => {
+                        traffic.push((scale * record - minimum * scale));
+                    });
+
+                    // Create rain & day array
+                    var rain = this.CreateRainArray();
+
+                    // If it's a weekend, day == 1 else day == 0
+                    var day = null;
+                    (this.selected_day == 'saturday' || this.selected_day == 'sunday') ?
+                    day = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]: day = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+                    // Create model and data to predict on
+                    var model = await this.GetModel(scat_id);
+
+                    // Create data Tensor to pass into model prediction, and then predict on the data with the fetched model
+                    var tensor = tf.tensor([
+                        [traffic, rain, day]
+                    ]);
+                    var prediction = await model.predict(tensor).array();
+
+                    // Return the unscaled predictions
+                    // Formula is Unscaled Value = (Scaled Value + (Minimum Value * Scale))/Scale
+                    return (parseFloat(prediction) + (parseFloat(minimum) * parseFloat(scale))) / parseFloat(scale);
+                }
             }
-          });
-        },
-        SelectRoute: function (id) {
-          // Clear the previously drawn selected route
-          this.RemoveSelectedRoute();
-
-          this.route_drawn = true;
-          this.selected_route_drawn = true;
-
-          // Draw route via the passed in ID
-          this.DrawRoute(this.routes[id], true);
-        },
-
-        // Routing Functions
-        GenerateSeededStart: async function () {
-          var starting_point = this.entry_point;
-          var current_point = starting_point;
-
-          var steps = [starting_point.scat_id]; // A list of all nodes travelled to/from, initalized with entry point
-          var total_distance = 0; // Total distance travelled
-          var total_traffic_volume = 0; // Total traffic volume
-
-          // Generate Seeded Starting Point
-          var num_steps = Math.floor(Math.random() * 6) + 1; // Generates a random int between 1 to 6
-          var step_index = 0; // Current index
-
-          // Variale to hold the point for the next point
-          var next_point_id = null;
-
-          // First - Find the next point
-          for (let i = 0; i < num_steps; i++) {
-            var num_neighbours = current_point.neighbours.length;
-            var neighbour_selection = Math.floor(Math.random() * (num_neighbours));
-
-            // Keep randomising the next point until new traversal is found
-            while (steps.includes(current_point.neighbours[neighbour_selection])) {
-              neighbour_selection = Math.floor(Math.random() * (num_neighbours));
-            }
-
-            next_point_id = current_point.neighbours[neighbour_selection];
-
-            // Get the object for the scat_id
-            var next_point_obj = _.find(groups, ['scat_id', next_point_id]);
-
-            // Find the distance between current_point --> next_point, record it in total_distance
-            total_distance += this.CalculateDistance([next_point_obj.lat, next_point_obj.lng], [current_point.lat, current_point.lng]);
-
-            // Find the traffic volume between points
-            total_traffic_volume += await this.GetTrafficVolume(current_point.scat_id);
-
-            // Push the record of the traversal onto steps
-            steps.push(next_point_id);
-
-            // Set the current_point to the found object of the next_point in groups
-            current_point = next_point_obj;
-          }
-
-          return { steps: steps, distance: total_distance, volume: total_traffic_volume };
-        },
-        FindPathBetweenPoints: async function (start, exit) {
-          var steps = start.steps;      // From generated seeded start'
-          var distance = start.distance // Already traversed distance
-          var traffic_volume = start.volume // Already observed traffic volume
-
-          var start_point = _.find(groups, ['scat_id', start.steps[-1]]); // Find the latest point
-
-          var current_point = null;
-          var index = 0;
-
-          steps.forEach(step => {
-            // Check that this point is not the last point in the steps array, to stop overflows
-            if (step != steps[steps.length - 1]) {
-              // Find the current point, if null
-              if (current_point == null) {
-                current_point = _.find(groups, ['scat_id', step]);
-              }
-
-              // Find the point after this one
-              var next_point = _.find(groups, ['scat_id', steps[index + 1]]);
-
-              // Update the current_point with the next_point, along with index
-              current_point = next_point;
-              index++;
-            }
-          });
-
-          // Create path to exit_point using 'As the Crow Flies' method
-          var control_index = 0;
-          var temp_steps = [];
-
-          var temp_point = current_point;
-          while (control_index <= 25 && temp_point.scat_id != exit.scat_id) {
-            // Find the closest point to the exit
-            var targetPoint = turf.point([exit.lat, exit.lng]);
-
-            // Create an array of Turf JS Point Objects from the neighbouring locations
-            var _points = [];
-            temp_point.neighbours.forEach(n_id => {
-              var obj = _.find(groups, ['scat_id', n_id]);
-
-              _points.push(
-                turf.point([obj.lat, obj.lng])
-              );
-            });
-
-            var points = turf.featureCollection(_points);
-            var nearest = turf.nearestPoint(targetPoint, points);
-            var nearest_index = nearest.properties.featureIndex;
-
-            var next_point = _.find(groups, ['scat_id', temp_point.neighbours[nearest_index]])
-
-            // Increment distance, traffic volume & record step 
-            distance += this.CalculateDistance([next_point.lat, next_point.lng], [temp_point.lat, temp_point.lng]);
-            traffic_volume += await this.GetTrafficVolume(temp_point.scat_id);
-            steps.push(next_point.scat_id);
-
-            temp_point = next_point;
-
-            // Increment the control index to ensure no freezing
-            control_index++;
-          }
-
-          return { steps: steps, distance: distance, volume: traffic_volume };
-        },
-
-        // Accumulative Functions
-        InitialiseMap: function () {
-          // Create the map object
-          this.map = L.map('mapid', {
-            zoomControl: false
-          }).setView([-37.8131, 145.0678], 13);
-
-          // Initialise map tiles from MapBox Service
-          L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
-            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-            maxZoom: 18,
-            id: 'mapbox.streets',
-            accessToken: 'pk.eyJ1IjoiZGFuaWVsZmVyZ3Vzb24iLCJhIjoiY2pzeWhhYmVyMHBneTQ0cXgydXJoeDUxMCJ9.LD82Xcdk-WD3a5TMcvdwEg'
-          }).addTo(this.map);
-
-          // Create Markers
-          groups.forEach(location => {
-            var lat = location['lat'];
-            var lng = location['lng'];
-            var id = location['scat_id'];
-
-            L.marker([lat, lng]).bindPopup("<b>Scat ID: " + id + "</b>").on('click', this.DrawNeighbourConnections).addTo(this.map);
-          });
-        },
-        DrawNeighbourConnections: function (marker) {
-          // Remove all current connections
-          this.RemoveLines();
-          temp_paths = [];
-
-          // Get the object of the selected marker
-          var obj = _.find(groups, {
-            'lat': marker.latlng.lat.toString(),
-            'lng': marker.latlng.lng.toString()
-          });
-
-          // Get the objects for the selected markers neighbours
-          var neighbour_objs = [];
-
-          // Draw a line from the selected marker to the neighbour marker
-          obj.neighbours.forEach(neighbour => {
-            var n_obj = _.find(groups, ['scat_id', neighbour]);
-
-            this.DrawLine([
-              [obj.lat, obj.lng],
-              [n_obj.lat, n_obj.lng]
-            ], 'blue', 'highlight', '0.2');
-          });
-        },
-
-        // Mapping & Drawing Functions
-        FindNearestPoint: function (lat, lng) {
-          var points = [];
-
-          // Create array of Turn Points
-          groups.forEach(point => {
-            points.push(
-              turf.point([parseFloat(point.lat), parseFloat(point.lng)])
-            );
-          });
-
-          var origin_point = turf.point([lat, lng]);
-
-          // Find nearest Point
-          var nearest_pos = turf.nearestPoint(origin_point, turf.featureCollection(points));
-
-          // Get the Object for the nearest Point & distance to
-          var nearest_obj = groups[nearest_pos.properties.featureIndex];
-          var distance_to = nearest_pos.properties.distanceToPoint;
-
-          return {
-            'nearest': nearest_obj,
-            'distance': distance_to
-          };
-        },
-        CalculateDistance: function (pointOne, pointTwo) {
-          var from = turf.point([pointOne[0], pointOne[1]]);
-          var to = turf.point([pointTwo[0], pointTwo[1]]);
-          var options = {
-            units: 'kilometers'
-          };
-
-          return turf.distance(from, to, options);
-        },
-        DrawLine: function (latlngs, colour, type, opacity) {
-          var pointOne = [parseFloat(latlngs[0][0]), parseFloat(latlngs[0][1])];
-          var pointTwo = [parseFloat(latlngs[1][0]), parseFloat(latlngs[1][1])];
-
-          if (opacity) {
-            var l = L.polyline([latlngs], {
-              color: colour,
-              opacity: opacity,
-            }).bindPopup("Distance: <b>" + this.CalculateDistance(pointOne, pointTwo).toFixed(2) + "kms</b>").addTo(this.map);
-          } else {
-            var l = L.polyline([latlngs], {
-              color: colour
-            }).bindPopup("Distance: <b>" + this.CalculateDistance(pointOne, pointTwo).toFixed(2) + "kms</b>").addTo(this.map);
-          }
-
-          // If temp (starting/ending lines) verticies, add to the temp directory 
-          switch (type) {
-            case 'highlight':
-              temp_paths.push(l)
-              break;
-
-            case 'static':
-              paths.push(l)
-              break;
-
-            case 'selected':
-              selected_route_path.push(l)
-              break;
-          }
-        },
-        RemoveLines: function () {
-          temp_paths.forEach(path => {
-            this.map.removeLayer(path);
-          });
-        },
-        RemoveSelectedRoute: function () {
-          selected_route_path.forEach(path => {
-            this.map.removeLayer(path);
-          });
-        },
-
-        // Geocoding Functions
-        GenerateURL: function (query) {
-          return "https://api.mapbox.com/geocoding/v5/mapbox.places/" + encodeURI(query) + ".json?access_token=pk.eyJ1IjoiZGFuaWVsZmVyZ3Vzb24iLCJhIjoiY2pzeWhhYmVyMHBneTQ0cXgydXJoeDUxMCJ9.LD82Xcdk-WD3a5TMcvdwEg&country=au";
-        },
-        GeocodeFrom: function (searchQuery, id) {
-          if (searchQuery) {
-            axios
-              .get(this.GenerateURL(searchQuery))
-              .then((response) => {
-                this.to_options = response.data.features
-              })
-              .catch((error) => (console.log(error)))
-          }
-        },
-        GeocodeTo: function (searchQuery, id) {
-          if (searchQuery) {
-            axios
-              .get(this.GenerateURL(searchQuery))
-              .then((response) => {
-                this.from_options = response.data.features
-              })
-              .catch((error) => (console.log(error)))
-          }
-        },
-
-        // General Functions
-        ConvertDayToIndex: function () {
-          // Convert the selected day into an index
-          switch (this.selected_day) {
-            case "monday":
-              return 0;
-              break;
-
-            case "tuesday":
-              return 1;
-              break;
-
-            case "wednesday":
-              return 2;
-              break;
-
-            case "thursday":
-              return 3;
-              break;
-
-            case "friday":
-              return 4;
-              break;
-
-            case "saturday":
-              return 5;
-              break;
-
-            case "sunday":
-              return 5;
-              break;
-          }
-        },
-        ConvertTimeToNummber: function () {
-          // Convert the selected time into an amount of 15 minute integers
-          return ((this.time_hour * 4) + Math.round(this.time_min / 15));
-        },
-        CreateRainArray: function () {
-          var _list = [];
-
-          for (let i = 0; i < 12; i++) {
-            _list.push(this.selected_rainfall / 20);
-          }
-
-          return _list;
-        },
-
-        // Machine Learning Functions
-        GetModel: async function (scat_id, day, time) {
-          return await tf.loadLayersModel('models/' + scat_id + '/model.json');
-        },
-        GetTrafficData: async function (scat_id, day, time) {
-          // Retrieve traffic data from file
-          var results = await axios.get('traffic_data/' + scat_id + '.csv').then((response) => { return response.data.split(','); });
-
-          // Chunk results into 95 values to represent each day
-          results = _.chunk(results, 95)
-
-          // Get the 12 previous records to predict on
-          var day_index = this.ConvertDayToIndex();
-          var time_num = this.ConvertTimeToNummber();
-
-          // Slice the array for the day and 
-          results = _.slice(results[day_index], time_num - 12, time_num);
-
-          return results;
-        },
-        GetTrafficVolume: async function (scat_id, day, time) {
-          // Retrieve the scale factor, minimum and maximum scaler data for the location
-          var csv_values = await axios.get('/scaler_data/' + scat_id + '.txt').then((response) => { return response.data.split(','); });
-
-          var scale = parseFloat(csv_values[0]);
-          var minimum = parseFloat(csv_values[1]);
-          var maximum = parseFloat(csv_values[2]);
-
-          // Retrieve the previous 12 records of traffic data - non scaled
-          var raw_traffic = await this.GetTrafficData(scat_id, day, time);
-          var traffic = [];
-
-          // Convert each of the raw_traffic records to scaled values
-          raw_traffic.forEach(record => {
-            traffic.push((scale * record - minimum * scale));
-          });
-
-          // Create rain & day array
-          var rain = this.CreateRainArray();
-
-          // If it's a weekend, day == 1 else day == 0
-          var day = null;
-          (this.selected_day == 'saturday' || this.selected_day == 'sunday')
-            ? day = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-            : day = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-
-          // Create model and data to predict on
-          var model = await this.GetModel(scat_id);
-
-          // Create data Tensor to pass into model prediction, and then predict on the data with the fetched model
-          var tensor = tf.tensor([[traffic, rain, day]]);
-          var prediction = await model.predict(tensor).array();
-
-          // Return the unscaled predictions
-          // Formula is Unscaled Value = (Scaled Value + (Minimum Value * Scale))/Scale
-          return (parseFloat(prediction) + (parseFloat(minimum) * parseFloat(scale))) / parseFloat(scale);
-        }
-      }
-    })
-  </script>
+        })
+    </script>
 </body>
 
 </html>
